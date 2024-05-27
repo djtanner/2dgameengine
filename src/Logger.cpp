@@ -12,9 +12,9 @@ std::string Logger::minStr;
 std::string Logger::secStr;
 std::string Logger::hourStr;
 
-void Logger::formatTime(tm* ltm, std::string& monthStr, std::string& hourStr, std::string& minStr, std::string& secStr){
-    
-    
+namespace{
+void formatTime(tm* ltm, std::string& monthStr, std::string& hourStr, std::string& minStr, std::string& secStr){
+             
     std::string month[] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
     
     monthStr = month[ltm->tm_mon];
@@ -37,6 +37,7 @@ void Logger::formatTime(tm* ltm, std::string& monthStr, std::string& hourStr, st
     } else {
         secStr = std::to_string(ltm->tm_sec);
     }
+}
 }
 
 void Logger::Log(const std::string& message){
