@@ -11,10 +11,11 @@ std::string Logger::monthStr;
 std::string Logger::minStr;
 std::string Logger::secStr;
 std::string Logger::hourStr;
+std::vector<LogEntry> Logger::messages;
 
 namespace{
 void formatTime(tm* ltm, std::string& monthStr, std::string& hourStr, std::string& minStr, std::string& secStr){
-             
+
     std::string month[] = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
     
     monthStr = month[ltm->tm_mon];
@@ -41,23 +42,34 @@ void formatTime(tm* ltm, std::string& monthStr, std::string& hourStr, std::strin
 }
 
 void Logger::Log(const std::string& message){
+    LogEntry entry;
+    entry.type = LOG_INFO;
+    
     time_t now = time(0);
     tm* ltm = localtime(&now);  
     formatTime(ltm, monthStr, hourStr, minStr, secStr);
-    
+    entry.message = "LOG: [" + std::to_string(ltm->tm_mday)  + "/" + monthStr + "/" + std::to_string( 1900 + ltm->tm_year) + " " + hourStr + ":" + 
+    minStr + ":" + secStr + "]" + message ;
 
 
-    std::cout << GREEN << "LOG: [" <<  ltm->tm_mday  << "/" << monthStr << "/" << 1900 + ltm->tm_year << " " << hourStr<< ":" << 
-    minStr << ":" << secStr << "]" << message << RESET << std::endl;
+    std::cout << GREEN << entry.message << RESET << std::endl;
+
+    messages.push_back(entry);
 }
 
 void Logger::Err(const std::string& message){
+    LogEntry entry;
+    entry.type = LOG_ERROR;
+    
     time_t now = time(0);
     tm* ltm = localtime(&now);  
     formatTime(ltm, monthStr, hourStr, minStr, secStr);
-    
+    entry.message = "ERROR: [" + std::to_string(ltm->tm_mday)  + "/" + monthStr + "/" + std::to_string( 1900 + ltm->tm_year) + " " + hourStr + ":" + 
+    minStr + ":" + secStr + "]" + message ;
 
 
-    std::cout << RED << "ERROR: [" <<  ltm->tm_mday  << "/" << monthStr << "/" << 1900 + ltm->tm_year << " " << hourStr<< ":" << 
-    minStr << ":" << secStr << "]" << message << RESET << std::endl;
+    std::cout << RED << entry.message << RESET << std::endl;
+
+    messages.push_back(entry);      
+
 }
