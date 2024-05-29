@@ -11,8 +11,22 @@ Also helps keep track of which entities a given system should process.
 */
 typedef std::bitset<MAX_COMPONENTS> Signature;
 
-class Component
+struct IComponent
 {
+protected:
+    static int nextId;
+};
+
+// Used to assign a unique ID to each component type
+template <typename T>
+class Component : public IComponent
+{
+    // Returns the unique ID of the Component type<T>
+    static int GetId()
+    {
+        static int id = nextId++;
+        return id;
+    }
 };
 
 class Entity
@@ -43,8 +57,19 @@ public:
     void AddEntityToSystem(Entity entity);
     void RemoveEntityFromSystem(Entity entity);
     std::vector<Entity> GetSystemEntities() const;
-    Signature &GetComponentSignature() const;
+    const Signature &GetComponentSignature() const;
+
+    // defines the component type T required for entity to be added to system
+    template <typename TComponent>
+    void RequireComponent();
 };
 class Registry
 {
 };
+
+template <typename TComponent>
+void System::RequireComponent()
+{
+    const auto componentId = Component<TComponent>::GetId();
+    componentSignature.set(componentId);
+}
