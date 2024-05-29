@@ -1,0 +1,9 @@
+{
+  "workbench.colorCustomizations": {
+    "[Sweet Dracula]": {
+      "titleBar.activeBackground": "#de0e8ecc",
+      "titleBar.activeForeground": "#b5e90a"
+    }
+  },
+  "window.titleBarStyle": "custom"
+}

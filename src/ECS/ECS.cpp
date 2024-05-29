@@ -12,7 +12,8 @@ void System::AddEntityToSystem(Entity entity)
 
 void System::RemoveEntityFromSystem(Entity entity)
 {
-    entities.erase(std::remove(entities.begin(), entities.end(), entity), entities.end());
+    entities.erase(std::remove(entities.begin(), entities.end(), entity),
+                   entities.end());
 }
 
 std::vector<Entity> System::GetSystemEntities() const
