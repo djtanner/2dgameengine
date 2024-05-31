@@ -26,6 +26,7 @@ template <typename T>
 class Component : public IComponent
 {
     // Returns the unique ID of the Component type<T>
+public:
     static int GetId()
     {
         static int id = nextId++;
@@ -219,7 +220,7 @@ void Registry::AddComponent(Entity entity, TArgs &&...args)
         componentPools[componentId] = newComponentPool;
     }
 
-    std::shared_ptr<Pool<TComponent>> componentPool = std::static_pointer_cast<Pool<TComponent>>[componentId];
+    std::shared_ptr<Pool<TComponent>> componentPool = std::static_pointer_cast<Pool<TComponent>>(componentPools[componentId]);
     if (entityId >= componentPool->GetSize())
     {
         componentPool->Resize(numEntities);
@@ -232,6 +233,8 @@ void Registry::AddComponent(Entity entity, TArgs &&...args)
 
     // Update entity signature to turn on the bit representing the component
     entityComponentSignatures[entityId].set(componentId);
+
+    Logger::Log("component id " + std::to_string(componentId) + " was added to entity id " + std::to_string(entityId));
 }
 
 template <typename TComponent>
