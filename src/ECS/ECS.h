@@ -4,6 +4,7 @@
 #include <bitset>
 #include <unordered_map>
 #include <typeindex>
+#include <set>
 
 const unsigned int MAX_COMPONENTS = 32;
 
@@ -49,6 +50,12 @@ public:
     bool operator!=(const Entity &other) const
     {
         return id != other.id;
+    }
+
+    bool operator<(const Entity &other) const
+    {
+        // compare entities based on their IDs
+        return this->id < other.id;
     }
 
     Entity &operator=(const Entity &other)
@@ -118,6 +125,10 @@ class Registry
 private:
     int numEntities = 0;
 
+    // need sets of entities so can update at end of frame update in game loop
+    std::set<Entity> entitiesToBeAdded;
+    std::set<Entity> entitiesToBeKilled;
+
     // Vector of component pools
     // each pool contains all the data for a certain component type, each pool will be different types so use the abstract IPool
     // vector index is componenet ID, pool index = entity ID
@@ -136,8 +147,27 @@ public:
     // Management of ECS
     Entity CreateEntity();
     void KillEntity(Entity entity);
+    void AddEntityToSystem(Entity entity);
+
     void AddSystem(System *system);
-    void AddComponent(Entity entity, IComponent *component);
+    void RemoveSystem(System *system);
+    bool HasSystem(System *system);
+    System *GetSystem(std::type_index type);
+
+    // &&args is a rvalue reference, used to pass arguments to the constructor of the component
+    template <typename TComponent, typename... TArgs>
+    void AddComponent(Entity entity, TArgs &&...args);
+
+    template <typename TComponent>
+    void RemoveComponent(Entity entity);
+
+    template <typename TComponent>
+    bool HasComponent(Entity entity) const;
+
+    template <typename TComponent>
+    TComponent &GetComponent(Entity entity) const;
+
+    void Update();
 };
 
 /*Implementation of RequireComponent*/
@@ -146,4 +176,38 @@ void System::RequireComponent()
 {
     const auto componentId = Component<TComponent>::GetId();
     componentSignature.set(componentId);
+}
+
+/*Implementation of Registry template functions*/
+template <typename TComponent, typename... TArgs>
+void Registry::AddComponent(Entity entity, TArgs &&...args)
+{
+    const auto componentId = Component<TComponent>::GetId();
+    const auto entityId = entity.GetId();
+
+    // Resize componentPools if necessary
+    if (componentPools.size() <= componentId)
+    {
+        componentPools.resize(componentId + 1, nullptr);
+    }
+
+    // Resize componentPools[componentId] if necessary
+    if (componentPools[componentId] == nullptr)
+    {
+        componentPools[componentId] = new Pool<TComponent>();
+    }
+
+    Pool<TComponent> *componentPool = componentPools[componentId];
+    if (entityId >= componentPool->GetSize())
+    {
+        componentPool->Resize(numEntities);
+    }
+
+    // Add component to pool
+
+    TComponent newComponent(std::forward<TArgs>(args)...);
+    componentPool->Set(entityId, newComponent);
+
+    // Update entity signature to turn on the bit representing the component
+    entityComponentSignatures[entityId].set(componentId);
 }
