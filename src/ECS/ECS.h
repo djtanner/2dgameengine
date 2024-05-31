@@ -20,7 +20,7 @@ protected:
     static int nextId;
 };
 
-// Used to assign a unique ID to each component type
+// Use a template class to assign a unique ID to each component type
 template <typename T>
 class Component : public IComponent
 {
@@ -149,11 +149,9 @@ public:
     void KillEntity(Entity entity);
     void AddEntityToSystem(Entity entity);
 
-    void AddSystem(System *system);
-    void RemoveSystem(System *system);
-    bool HasSystem(System *system);
-    System *GetSystem(std::type_index type);
-
+    ////////////////////////////////////////////////////////////////////////////////////////////
+    // Components
+    ////////////////////////////////////////////////////////////////////////////////////////////
     // &&args is a rvalue reference, used to pass arguments to the constructor of the component
     template <typename TComponent, typename... TArgs>
     void AddComponent(Entity entity, TArgs &&...args);
@@ -166,6 +164,23 @@ public:
 
     template <typename TComponent>
     TComponent &GetComponent(Entity entity) const;
+
+    ////////////////////////////////////////////////////////////////////////////////////////////
+    // Systems
+    ////////////////////////////////////////////////////////////////////////////////////////////
+    template <typename TSystem, typename... TArgs>
+    void AddSystem(TArgs &&...args);
+
+    template <typename TSystem>
+    void RemoveSystem();
+
+    template <typename TSystem>
+    bool HasSystem() const;
+
+    template <typename TSystem>
+    TSystem &GetSystem() const;
+
+    void AddEntityToSystems(Entity entity);
 
     void Update();
 };
@@ -226,8 +241,37 @@ void Registry::RemoveComponent(Entity entity)
     const auto componentId = Component<TComponent>::GetId();
     const auto entityId = entity.GetId();
 
-    if (HasComponent(entity))
+    if (this->template HasComponent<TComponent>(entity))
     {
         entityComponentSignatures[entityId].set(componentId, false);
     }
+}
+
+// Implementation of Systems templates
+template <typename TSystem, typename... TArgs>
+void Registry::AddSystem(TArgs &&...args)
+{
+    TSystem *newSystem(new TSystem(std::forward<TArgs>(args)...));
+    systems.insert(std::make_pair(std::type_index(typeid(TSystem)), newSystem));
+}
+
+template <typename TSystem>
+void Registry::RemoveSystem()
+{
+    auto system = systems.find(std::type_index(typeid(TSystem)));
+    systems.erase(system);
+}
+
+template <typename TSystem>
+bool Registry::HasSystem() const
+{
+    auto system = systems.find(std::type_index(typeid(TSystem)));
+    return system != systems.end();
+}
+
+template <typename TSystem>
+TSystem &Registry::GetSystem() const
+{
+    auto system = systems.find(std::type_index(typeid(TSystem)));
+    return *(std::static_pointer_cast<TSystem>(system->second));
 }
