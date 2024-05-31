@@ -38,13 +38,26 @@ Entity Registry::CreateEntity()
     Entity entity(entityId);
     entitiesToBeAdded.insert(entity);
 
+    // Make sure the entityComponentSignatures vector can accommodate the new entity
+    if (entityId >= entityComponentSignatures.size())
+    {
+        entityComponentSignatures.resize(entityId + 1);
+    }
+
     Logger::Log("Entity created with ID: " + std::to_string(entityId));
     return entity;
 }
 
 void Registry::Update()
 {
-    // Add entities to systems
+    // Add entities to the correct systems
+
+    for (auto entity : entitiesToBeAdded)
+    {
+        AddEntityToSystems(entity);
+    }
+
+    entitiesToBeAdded.clear();
 }
 
 // Adds an entity to the System if the entity contains all of the required components

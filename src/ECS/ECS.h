@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include <typeindex>
 #include <set>
+#include "../Logger/Logger.h"
 
 const unsigned int MAX_COMPONENTS = 32;
 
@@ -132,17 +133,24 @@ private:
     // Vector of component pools
     // each pool contains all the data for a certain component type, each pool will be different types so use the abstract IPool
     // vector index is componenet ID, pool index = entity ID
-    std::vector<IPool *> componentPools;
+    std::vector<std::shared_ptr<IPool>> componentPools;
 
     // Vector of component signatures
     // each signature represents the components an entity has
     // vector index = entity ID
     std::vector<Signature> entityComponentSignatures;
 
-    std::unordered_map<std::type_index, System *> systems;
+    std::unordered_map<std::type_index, std::shared_ptr<System>> systems;
 
 public:
     Registry() = default;
+
+    // use unique_ptr for registry so it will automatically deallocate when out of scope
+    ~Registry()
+    {
+        Logger::Log("Registry was destructed");
+    }
+    void Update();
 
     // Management of ECS
     Entity CreateEntity();
@@ -181,8 +189,6 @@ public:
     TSystem &GetSystem() const;
 
     void AddEntityToSystems(Entity entity);
-
-    void Update();
 };
 
 /*Implementation of RequireComponent*/
@@ -209,10 +215,11 @@ void Registry::AddComponent(Entity entity, TArgs &&...args)
     // Resize componentPools[componentId] if necessary
     if (componentPools[componentId] == nullptr)
     {
-        componentPools[componentId] = new Pool<TComponent>();
+        std::shared_ptr<Pool<TComponent>> newComponentPool = std::make_shared<Pool<TComponent>>();
+        componentPools[componentId] = newComponentPool;
     }
 
-    Pool<TComponent> *componentPool = componentPools[componentId];
+    std::shared_ptr<Pool<TComponent>> componentPool = std::static_pointer_cast<Pool<TComponent>>[componentId];
     if (entityId >= componentPool->GetSize())
     {
         componentPool->Resize(numEntities);
@@ -251,7 +258,7 @@ void Registry::RemoveComponent(Entity entity)
 template <typename TSystem, typename... TArgs>
 void Registry::AddSystem(TArgs &&...args)
 {
-    TSystem *newSystem(new TSystem(std::forward<TArgs>(args)...));
+    std::shared_ptr<TSystem> newSystem = std::make_shared<TSystem>(std::forward<TArgs>(args)...);
     systems.insert(std::make_pair(std::type_index(typeid(TSystem)), newSystem));
 }
 
