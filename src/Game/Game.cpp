@@ -7,7 +7,9 @@
 #include "../ECS/ECS.h"
 #include "../Components/TransformComponent.h"
 #include "../Components/RigidBodyComponent.h"
+#include "../Components/SpriteComponent.h"
 #include "../Systems/MovementSystem.h"
+#include "../Systems/RenderSystem.h"
 
 Game::Game()
 {
@@ -91,12 +93,14 @@ void Game::Setup()
 
     // Add the systems that need to be processed
     registry->AddSystem<MovementSystem>();
+    registry->AddSystem<RenderSystem>();
 
     // todo:
     Entity tank = registry->CreateEntity();
 
     tank.AddComponent<TransformComponent>(glm::vec2(10.0, 30.0), glm::vec2(1.0, 1.0), 0.0);
     tank.AddComponent<RigidBodyComponent>(glm::vec2(50.0, 0.0));
+    tank.AddComponent<SpriteComponent>(10, 10);
 
     //  tank.AddComponent<VelocityComponent>();
     //  tank.AddComponent<SpriteComponent>("./assets/images/tank.png");
@@ -116,6 +120,7 @@ void Game::Update()
     millisecsPreviousFrame = SDL_GetTicks();
     // TODO:
     registry->GetSystem<MovementSystem>().Update(deltaTime);
+
     //  CollisionSystem.Update();
     //  RenderSystem.Update();
     //  HealthSystem.Update();
@@ -130,7 +135,7 @@ void Game::Render()
 {
     SDL_SetRenderDrawColor(renderer, 21, 21, 21, 255);
     SDL_RenderClear(renderer);
-
+    registry->GetSystem<RenderSystem>().Update(renderer);
     SDL_RenderPresent(renderer);
 }
 
