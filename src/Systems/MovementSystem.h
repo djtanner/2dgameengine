@@ -13,7 +13,7 @@ public:
         RequireComponent<RigidBodyComponent>();
     }
 
-    void Update()
+    void Update(double deltaTime)
     {
         // TODO: update entity position based on its velocity every frame of the game loop
 
@@ -22,8 +22,10 @@ public:
             auto &transform = entity.GetComponent<TransformComponent>();
             const auto rigidbody = entity.GetComponent<RigidBodyComponent>();
 
-            transform.position.x += rigidbody.velocity.x;
-            transform.position.y += rigidbody.velocity.y;
+            transform.position.x += rigidbody.velocity.x * deltaTime;
+            transform.position.y += rigidbody.velocity.y * deltaTime;
+
+            Logger::Log("Entity moved to: " + std::to_string(transform.position.x) + ", " + std::to_string(transform.position.y));
         }
     }
 };

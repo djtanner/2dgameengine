@@ -115,12 +115,15 @@ void Game::Update()
 
     millisecsPreviousFrame = SDL_GetTicks();
     // TODO:
-    registry->GetSystem<MovementSystem>().Update();
+    registry->GetSystem<MovementSystem>().Update(deltaTime);
     //  CollisionSystem.Update();
     //  RenderSystem.Update();
     //  HealthSystem.Update();
     //  AnimationSystem.Update();
     //  AudioSystem.Update();
+
+    // Update the registry to process the entities that are waiting to be created/deleted
+    registry->Update();
 }
 
 void Game::Render()
