@@ -65,6 +65,20 @@ public:
         id = other.id;
         return *this;
     }
+
+    template <typename TComponent, typename... TArgs>
+    void AddComponent(TArgs &&...args);
+
+    template <typename TComponent>
+    void RemoveComponent();
+
+    template <typename TComponent>
+    void HasComponent() const;
+
+    template <typename TComponent>
+    TComponent &GetComponent() const;
+    // Keep a pointer to the entity's owner registry, using a forward declaration
+    class Registry *registry;
 };
 
 /*
@@ -257,6 +271,16 @@ void Registry::RemoveComponent(Entity entity)
     }
 }
 
+template <typename TComponent>
+TComponent &Registry::GetComponent(Entity entity) const
+{
+    const auto componentId = Component<TComponent>::GetId();
+    const auto entityId = entity.GetId();
+
+    auto componentPool = std::static_pointer_cast<Pool<TComponent>>(componentPools[componentId]);
+    return componentPool->Get(entityId);
+}
+
 // Implementation of Systems templates
 template <typename TSystem, typename... TArgs>
 void Registry::AddSystem(TArgs &&...args)
@@ -284,4 +308,29 @@ TSystem &Registry::GetSystem() const
 {
     auto system = systems.find(std::type_index(typeid(TSystem)));
     return *(std::static_pointer_cast<TSystem>(system->second));
+}
+
+/* Implementation of Entity template functions*/
+template <typename TComponent, typename... TArgs>
+void Entity::AddComponent(TArgs &&...args)
+{
+    registry->AddComponent<TComponent>(*this, std::forward<TArgs>(args)...);
+}
+
+template <typename TComponent>
+void Entity::RemoveComponent()
+{
+    registry->RemoveComponent<TComponent>(*this);
+}
+
+template <typename TComponent>
+void Entity::HasComponent() const
+{
+    registry->HasComponent<TComponent>(*this);
+}
+
+template <typename TComponent>
+TComponent &Entity::GetComponent() const
+{
+    registry->GetComponent<TComponent>(*this);
 }

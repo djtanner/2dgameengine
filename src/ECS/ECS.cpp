@@ -36,6 +36,7 @@ Entity Registry::CreateEntity()
 
     entityId = numEntities++;
     Entity entity(entityId);
+    entity.registry = this;
     entitiesToBeAdded.insert(entity);
 
     // Make sure the entityComponentSignatures vector can accommodate the new entity
