@@ -211,3 +211,23 @@ void Registry::AddComponent(Entity entity, TArgs &&...args)
     // Update entity signature to turn on the bit representing the component
     entityComponentSignatures[entityId].set(componentId);
 }
+
+template <typename TComponent>
+bool Registry::HasComponent(Entity entity) const
+{
+    const auto componentId = Component<TComponent>::GetId();
+    const auto entityId = entity.GetId();
+    return entityComponentSignatures[entityId].test(componentId);
+}
+
+template <typename TComponent>
+void Registry::RemoveComponent(Entity entity)
+{
+    const auto componentId = Component<TComponent>::GetId();
+    const auto entityId = entity.GetId();
+
+    if (HasComponent(entity))
+    {
+        entityComponentSignatures[entityId].set(componentId, false);
+    }
+}
