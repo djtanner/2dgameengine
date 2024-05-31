@@ -10,11 +10,13 @@
 #include "../Components/SpriteComponent.h"
 #include "../Systems/MovementSystem.h"
 #include "../Systems/RenderSystem.h"
+#include "../AssetStore/AssetStore.h"
 
 Game::Game()
 {
     isRunning = false;
     registry = std::make_unique<Registry>();
+    assetStore = std::make_unique<AssetStore>();
     Logger::Log("Game constructor called");
 }
 
@@ -55,17 +57,6 @@ void Game::Initialize()
     isRunning = true;
 }
 
-void Game::Run()
-{
-    Setup();
-    while (isRunning)
-    {
-        ProcessInput();
-        Update();
-        Render();
-    }
-}
-
 void Game::ProcessInput()
 {
     SDL_Event sdlEvent;
@@ -95,12 +86,14 @@ void Game::Setup()
     registry->AddSystem<MovementSystem>();
     registry->AddSystem<RenderSystem>();
 
-    // todo:
+    assetStore->AddTexture(renderer, "tank-image", "./assets/images/tank-panther-right.png");
+    assetStore->AddTexture(renderer, "truck-image", "./assets/images/truck-ford-right.png");
+
     Entity tank = registry->CreateEntity();
 
     tank.AddComponent<TransformComponent>(glm::vec2(10.0, 30.0), glm::vec2(1.0, 1.0), 0.0);
     tank.AddComponent<RigidBodyComponent>(glm::vec2(50.0, 0.0));
-    tank.AddComponent<SpriteComponent>(10, 10);
+    tank.AddComponent<SpriteComponent>("tank-image", 32, 32);
 
     //  tank.AddComponent<VelocityComponent>();
     //  tank.AddComponent<SpriteComponent>("./assets/images/tank.png");
@@ -135,8 +128,21 @@ void Game::Render()
 {
     SDL_SetRenderDrawColor(renderer, 21, 21, 21, 255);
     SDL_RenderClear(renderer);
-    registry->GetSystem<RenderSystem>().Update(renderer);
+
+    // registry->GetSystem<RenderSystem>().Update(renderer, std::make_unique<AssetStore> & assetStore);
+    registry->GetSystem<RenderSystem>().Update(renderer, assetStore);
     SDL_RenderPresent(renderer);
+}
+
+void Game::Run()
+{
+    Setup();
+    while (isRunning)
+    {
+        ProcessInput();
+        Update();
+        Render();
+    }
 }
 
 void Game::Destroy()
