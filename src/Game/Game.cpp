@@ -5,8 +5,9 @@
 #include <SDL2/SDL_image.h>
 #include "../Logger/Logger.h"
 #include "../ECS/ECS.h"
-#include "../Components/TranformComponent.h"
+#include "../Components/TransformComponent.h"
 #include "../Components/RigidBodyComponent.h"
+#include "../Systems/MovementSystem.h"
 
 Game::Game()
 {
@@ -88,6 +89,9 @@ void Game::ProcessInput()
 void Game::Setup()
 {
 
+    // Add the systems that need to be processed
+    registry->AddSystem<MovementSystem>();
+
     // todo:
     Entity tank = registry->CreateEntity();
 
@@ -111,7 +115,7 @@ void Game::Update()
 
     millisecsPreviousFrame = SDL_GetTicks();
     // TODO:
-    //  MovementSystem.Update();
+    registry->GetSystem<MovementSystem>().Update();
     //  CollisionSystem.Update();
     //  RenderSystem.Update();
     //  HealthSystem.Update();
