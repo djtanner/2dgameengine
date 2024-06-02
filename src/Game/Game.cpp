@@ -11,6 +11,9 @@
 #include "../Systems/MovementSystem.h"
 #include "../Systems/RenderSystem.h"
 #include "../AssetStore/AssetStore.h"
+#include <vector>
+#include <fstream>
+#include <sstream>
 
 Game::Game()
 {
@@ -79,25 +82,81 @@ void Game::ProcessInput()
     }
 }
 
-void Game::Setup()
+// parse the tilemap file into a 2d vector to get the values
+void Game::parseFile(std::string filename, std::vector<std::vector<int>> &tilemap)
 {
+    std::ifstream file(filename);
 
+    if (!file.is_open())
+    {
+        Logger::Err("Error opening file: " + filename);
+    }
+
+    std::string line;
+
+    while (std::getline(file, line))
+    {
+        std::stringstream ss(line);
+        std::string item;
+        std::vector<int> row;
+
+        while (std::getline(ss, item, ','))
+        {
+            row.push_back(std::stoi(item));
+        }
+
+        tilemap.push_back(row);
+    }
+
+    file.close();
+}
+
+void Game::LoadLevel(int level)
+{
     // Add the systems that need to be processed
     registry->AddSystem<MovementSystem>();
     registry->AddSystem<RenderSystem>();
 
     assetStore->AddTexture(renderer, "tank-image", "./assets/images/tank-panther-right.png");
     assetStore->AddTexture(renderer, "truck-image", "./assets/images/truck-ford-right.png");
+    assetStore->AddTexture(renderer, "tilemap-sheet", "./assets/tilemaps/jungle.png");
+
+    std::vector<std::vector<int>> tilemap;
+    // parse the tilemap file and create a map of the tiles
+    parseFile("./assets/tilemaps/jungle.map", tilemap);
+
+    //  create entities for each tile in the map
+    for (int i = 0; i < tilemap.size(); i++)
+    {
+        for (int j = 0; j < tilemap[i].size(); j++)
+        {
+            int val = tilemap[i][j];
+
+            //  get the x and y position of the tile in the tilemap to use as the source rect
+            int srcX = (val % 10) * TILE_SIZE;
+            int srcY = (val / 10) * TILE_SIZE;
+
+            Entity tile = registry->CreateEntity();
+            tile.AddComponent<TransformComponent>(glm::vec2(j * TILE_SIZE, i * TILE_SIZE), glm::vec2(1.0, 1.0), 0.0);
+            tile.AddComponent<SpriteComponent>("tilemap-sheet", TILE_SIZE, TILE_SIZE, srcX, srcY);
+        }
+    }
 
     Entity tank = registry->CreateEntity();
 
     tank.AddComponent<TransformComponent>(glm::vec2(10.0, 30.0), glm::vec2(1.0, 1.0), 0.0);
     tank.AddComponent<RigidBodyComponent>(glm::vec2(50.0, 0.0));
-    tank.AddComponent<SpriteComponent>("tank-image", 32, 32);
+    tank.AddComponent<SpriteComponent>("tank-image", TILE_SIZE, TILE_SIZE);
 
-    //  tank.AddComponent<VelocityComponent>();
-    //  tank.AddComponent<SpriteComponent>("./assets/images/tank.png");
-    //  tank.AddComponent<BoxColliderComponent>();
+    Entity truck = registry->CreateEntity();
+    truck.AddComponent<TransformComponent>(glm::vec2(50.0, 100.0), glm::vec2(1.0, 1.0), 0.0);
+    truck.AddComponent<RigidBodyComponent>(glm::vec2(20.0, 0.0));
+    truck.AddComponent<SpriteComponent>("truck-image", TILE_SIZE, TILE_SIZE);
+}
+
+void Game::Setup()
+{
+    LoadLevel(1);
 }
 
 void Game::Update()

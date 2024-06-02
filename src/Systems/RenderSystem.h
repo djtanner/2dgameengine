@@ -12,7 +12,7 @@ public:
     RenderSystem()
     {
         RequireComponent<TransformComponent>();
-        RequireComponent<RigidBodyComponent>();
+        RequireComponent<SpriteComponent>();
     }
 
     void Update(SDL_Renderer *renderer, std::unique_ptr<AssetStore> &assetStore)

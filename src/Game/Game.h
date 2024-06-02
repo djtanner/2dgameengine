@@ -7,6 +7,7 @@
 
 const int FPS = 500;
 const int MILLISECS_PER_FRAME = 1000 / FPS;
+const int TILE_SIZE = 32;
 
 class Game
 {
@@ -16,6 +17,7 @@ private:
     SDL_Window *window;
     SDL_Renderer *renderer;
 
+    void parseFile(std::string filename, std::vector<std::vector<int>> &tilemap);
     // entity manager
     std::unique_ptr<Registry> registry;
     std::unique_ptr<AssetStore> assetStore;
@@ -25,6 +27,7 @@ public:
     ~Game();
     void Initialize();
     void Run();
+    void LoadLevel(int level);
     void Setup();
     void ProcessInput();
     void Update();

@@ -6,6 +6,7 @@
 #include <typeindex>
 #include <set>
 #include "../Logger/Logger.h"
+#include <iostream>
 
 const unsigned int MAX_COMPONENTS = 32;
 
