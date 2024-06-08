@@ -137,7 +137,7 @@ void Game::LoadLevel(int level)
             int srcY = (val / 10) * TILE_SIZE;
 
             Entity tile = registry->CreateEntity();
-            tile.AddComponent<TransformComponent>(glm::vec2(j * TILE_SIZE, i * TILE_SIZE), glm::vec2(1.0, 1.0), 0.0);
+            tile.AddComponent<TransformComponent>(glm::vec2(j * TILE_SIZE * TILE_SCALE, i * TILE_SIZE * TILE_SCALE), glm::vec2(TILE_SCALE, TILE_SCALE), 0.0);
             tile.AddComponent<SpriteComponent>("tilemap-sheet", TILE_SIZE, TILE_SIZE, srcX, srcY);
         }
     }
