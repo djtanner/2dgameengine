@@ -17,12 +17,31 @@ public:
 
     void Update(SDL_Renderer *renderer, std::unique_ptr<AssetStore> &assetStore)
     {
-        // TODO: update entity position based on its velocity every frame of the game loop
+        struct RenderableEntity
+        {
+            TransformComponent transformComponent;
+            SpriteComponent spriteComponent;
+        };
 
+        std::vector<RenderableEntity>
+            renderableEntities;
+
+        // sort entities by z index
         for (auto entity : GetSystemEntities())
         {
-            const auto transform = entity.GetComponent<TransformComponent>();
-            const auto sprite = entity.GetComponent<SpriteComponent>();
+            RenderableEntity renderableEntity;
+            renderableEntity.transformComponent = entity.GetComponent<TransformComponent>();
+            renderableEntity.spriteComponent = entity.GetComponent<SpriteComponent>();
+            renderableEntities.emplace_back(renderableEntity);
+        }
+
+        std::sort(renderableEntities.begin(), renderableEntities.end(), [](const RenderableEntity &a, const RenderableEntity &b)
+                  { return a.spriteComponent.zIndex < b.spriteComponent.zIndex; });
+
+        for (auto entity : renderableEntities)
+        {
+            const auto transform = entity.transformComponent;
+            const auto sprite = entity.spriteComponent;
 
             SDL_Rect dstRect = {
                 static_cast<int>(transform.position.x),

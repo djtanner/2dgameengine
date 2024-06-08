@@ -8,7 +8,7 @@
 const int FPS = 500;
 const int MILLISECS_PER_FRAME = 1000 / FPS;
 const int TILE_SIZE = 32;
-const int TILE_SCALE = 2;
+const int TILE_SCALE = 1;
 
 class Game
 {
