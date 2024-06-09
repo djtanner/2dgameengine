@@ -24,6 +24,7 @@ Game::Game()
     isRunning = false;
     registry = std::make_unique<Registry>();
     assetStore = std::make_unique<AssetStore>();
+    renderColliders = false;
     Logger::Log("Game constructor called");
 }
 
@@ -79,6 +80,10 @@ void Game::ProcessInput()
             {
                 isRunning = false;
                 return;
+            }
+            if (sdlEvent.key.keysym.sym == SDLK_d)
+            {
+                renderColliders = !renderColliders;
             }
 
             break;
@@ -207,7 +212,7 @@ void Game::Render()
     SDL_RenderClear(renderer);
 
     // registry->GetSystem<RenderSystem>().Update(renderer, std::make_unique<AssetStore> & assetStore);
-    registry->GetSystem<RenderSystem>().Update(renderer, assetStore);
+    registry->GetSystem<RenderSystem>().Update(renderer, assetStore, renderColliders);
     SDL_RenderPresent(renderer);
 }
 

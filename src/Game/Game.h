@@ -17,6 +17,7 @@ private:
     int millisecsPreviousFrame = 0;
     SDL_Window *window;
     SDL_Renderer *renderer;
+    bool renderColliders = false;
 
     void parseFile(std::string filename, std::vector<std::vector<int>> &tilemap);
     // entity manager
