@@ -21,6 +21,7 @@ public:
         {
             TransformComponent transformComponent;
             SpriteComponent spriteComponent;
+            bool hasCollider;
         };
 
         std::vector<RenderableEntity>
@@ -32,7 +33,24 @@ public:
             RenderableEntity renderableEntity;
             renderableEntity.transformComponent = entity.GetComponent<TransformComponent>();
             renderableEntity.spriteComponent = entity.GetComponent<SpriteComponent>();
+            renderableEntity.hasCollider = entity.HasComponent<BoxColliderComponent>();
             renderableEntities.emplace_back(renderableEntity);
+
+            // draw  box collider
+
+            /* if (entity.HasComponent<BoxColliderComponent>())
+             {
+                 const auto transform = entity.GetComponent<TransformComponent>();
+                 const auto sprite = entity.GetComponent<SpriteComponent>();
+                 SDL_Rect collider = {
+                     static_cast<int>(transform.position.x + sprite.width / 2 - sprite.width / 2 * transform.scale.x),
+                     static_cast<int>(transform.position.y + sprite.height / 2 - sprite.height / 2 * transform.scale.y),
+                     static_cast<int>(sprite.width * transform.scale.x),
+                     static_cast<int>(sprite.height * transform.scale.y),
+                 };
+                 SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+                 SDL_RenderDrawRect(renderer, &collider);
+             }*/
         }
 
         std::sort(renderableEntities.begin(), renderableEntities.end(), [](const RenderableEntity &a, const RenderableEntity &b)
@@ -54,8 +72,12 @@ public:
 
             SDL_RenderCopyEx(renderer, assetStore->GetTexture(sprite.assetId), &srcRect, &dstRect, transform.rotation, nullptr, SDL_FLIP_NONE);
 
-            // SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-            // SDL_RenderFillRect(renderer, &rect);
+            if (entity.hasCollider)
+            {
+
+                SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+                SDL_RenderDrawRect(renderer, &dstRect);
+            }
         }
     }
 };
