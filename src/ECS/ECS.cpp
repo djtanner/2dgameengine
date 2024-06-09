@@ -9,6 +9,11 @@ int Entity::GetId() const
     return id;
 }
 
+void Entity::Kill()
+{
+    registry->KillEntity(*this);
+}
+
 void System::AddEntityToSystem(Entity entity)
 {
     entities.push_back(entity);
@@ -34,19 +39,35 @@ Entity Registry::CreateEntity()
 {
     int entityId;
 
-    entityId = numEntities++;
+    if (freeIds.size() > 0)
+    {
+
+        entityId = freeIds.front();
+        freeIds.pop();
+    }
+    else
+    {
+        entityId = numEntities++;
+        // Make sure the entityComponentSignatures vector can accommodate the new entity
+        if (entityId >= entityComponentSignatures.size())
+        {
+            entityComponentSignatures.resize(entityId + 1);
+        }
+    }
+
     Entity entity(entityId);
     entity.registry = this;
     entitiesToBeAdded.insert(entity);
 
-    // Make sure the entityComponentSignatures vector can accommodate the new entity
-    if (entityId >= entityComponentSignatures.size())
-    {
-        entityComponentSignatures.resize(entityId + 1);
-    }
-
     Logger::Log("Entity created with ID: " + std::to_string(entityId));
     return entity;
+}
+
+void Registry::KillEntity(Entity entity)
+{
+
+    // Remove the entity from the set of entities to be destroyed
+    entitiesToBeKilled.insert(entity);
 }
 
 void Registry::Update()
@@ -59,6 +80,16 @@ void Registry::Update()
     }
 
     entitiesToBeAdded.clear();
+
+    for (auto entity : entitiesToBeKilled)
+    {
+        RemoveEntityFromSystems(entity);
+        freeIds.push(entity.GetId());
+
+        entityComponentSignatures[entity.GetId()].reset();
+    }
+
+    entitiesToBeKilled.clear();
 }
 
 // Adds an entity to the System if the entity contains all of the required components
@@ -77,5 +108,14 @@ void Registry::AddEntityToSystems(Entity entity)
         {
             system.second->AddEntityToSystem(entity);
         }
+    }
+}
+
+// Removes an entity from the System
+void Registry::RemoveEntityFromSystems(Entity entity)
+{
+    for (auto &system : systems)
+    {
+        system.second->RemoveEntityFromSystem(entity);
     }
 }

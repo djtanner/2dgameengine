@@ -7,6 +7,7 @@
 #include <set>
 #include "../Logger/Logger.h"
 #include <iostream>
+#include <queue>
 
 const unsigned int MAX_COMPONENTS = 32;
 
@@ -35,6 +36,9 @@ public:
     }
 };
 
+////////////////////////////////////////////////////////////////////////////////////////////
+// Entity Class
+////////////////////////////////////////////////////////////////////////////////////////////
 class Entity
 {
 private:
@@ -42,7 +46,7 @@ private:
 
 public:
     Entity(int id) : id(id){};
-
+    void Kill();
     int GetId() const;
 
     bool operator==(const Entity &other) const
@@ -158,6 +162,9 @@ private:
 
     std::unordered_map<std::type_index, std::shared_ptr<System>> systems;
 
+    // List of available entity ids that were previously removed
+    std::queue<int> freeIds;
+
 public:
     Registry() = default;
 
@@ -171,7 +178,8 @@ public:
     // Management of ECS
     Entity CreateEntity();
     void KillEntity(Entity entity);
-    void AddEntityToSystem(Entity entity);
+    void AddEntityToSystems(Entity entity);
+    void RemoveEntityFromSystems(Entity entity);
 
     ////////////////////////////////////////////////////////////////////////////////////////////
     // Components
@@ -204,7 +212,8 @@ public:
     template <typename TSystem>
     TSystem &GetSystem() const;
 
-    void AddEntityToSystems(Entity entity);
+    void AddEntityToSystem(Entity entity);
+    void RemoveEntityFromSystem(Entity entity);
 };
 
 /*Implementation of RequireComponent*/
