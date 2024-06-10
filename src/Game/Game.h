@@ -4,6 +4,7 @@
 #include <SDL2/SDL.h>
 #include "../ECS/ECS.h"
 #include "../AssetStore/AssetStore.h"
+#include "../EventBus/EventBus.h"
 
 const int FPS = 500;
 const int MILLISECS_PER_FRAME = 1000 / FPS;
@@ -23,6 +24,7 @@ private:
     // entity manager
     std::unique_ptr<Registry> registry;
     std::unique_ptr<AssetStore> assetStore;
+    std::unique_ptr<EventBus> eventBus; // keeps track of event subscriptions
 
 public:
     Game();
