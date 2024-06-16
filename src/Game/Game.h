@@ -9,7 +9,7 @@
 const int FPS = 500;
 const int MILLISECS_PER_FRAME = 1000 / FPS;
 const int TILE_SIZE = 32;
-const int TILE_SCALE = 1;
+const int TILE_SCALE = 2;
 
 class Game
 {
@@ -19,6 +19,7 @@ private:
     SDL_Window *window;
     SDL_Renderer *renderer;
     bool renderColliders = false;
+    SDL_Rect camera;
 
     void parseFile(std::string filename, std::vector<std::vector<int>> &tilemap);
     // entity manager
@@ -38,8 +39,10 @@ public:
     void Render();
     void Destroy();
 
-    int windowWidth;
-    int windowHeight;
+    static int windowWidth;
+    static int windowHeight;
+    static int mapWidth;
+    static int mapHeight;
 };
 
 #endif

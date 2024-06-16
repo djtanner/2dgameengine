@@ -15,7 +15,7 @@ public:
         RequireComponent<SpriteComponent>();
     }
 
-    void Update(SDL_Renderer *renderer, std::unique_ptr<AssetStore> &assetStore, bool renderColliders = false)
+    void Update(SDL_Renderer *renderer, std::unique_ptr<AssetStore> &assetStore, bool renderColliders, SDL_Rect &camera)
     {
         struct RenderableEntity
         {
@@ -46,8 +46,8 @@ public:
             const auto sprite = entity.spriteComponent;
 
             SDL_Rect dstRect = {
-                static_cast<int>(transform.position.x),
-                static_cast<int>(transform.position.y),
+                static_cast<int>(transform.position.x - (!sprite.isFixed ? camera.x : 0)), // shift rendering sprites by camera position
+                static_cast<int>(transform.position.y - (!sprite.isFixed ? camera.y : 0)),
                 static_cast<int>(sprite.width * transform.scale.x),
                 static_cast<int>(sprite.height * transform.scale.y),
             };
