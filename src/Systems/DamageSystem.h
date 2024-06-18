@@ -22,8 +22,8 @@ public:
     void OnCollision(CollisionEvent &event)
     {
         Logger::Log("Entity " + std::to_string(event.entity1.GetId()) + " collided with entity " + std::to_string(event.entity2.GetId()));
-        event.entity1.Kill();
-        event.entity2.Kill();
+        // event.entity1.Kill();
+        // event.entity2.Kill();
     }
 
     void Update()

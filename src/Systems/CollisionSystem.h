@@ -29,7 +29,7 @@ public:
                 auto &transform2 = entity2.GetComponent<TransformComponent>();
                 if (CheckCollision(box1, transform1, box2, transform2))
                 {
-                    Logger::Log("Entity " + std::to_string(entity1.GetId()) + " collided wih entity " + std::to_string(entity2.GetId()));
+                    // Logger::Log("Entity " + std::to_string(entity1.GetId()) + " collided wih entity " + std::to_string(entity2.GetId()));
 
                     // emit an event
                     eventBus->EmitEvent<CollisionEvent>(entity1, entity2);
