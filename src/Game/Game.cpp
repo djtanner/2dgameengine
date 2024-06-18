@@ -13,6 +13,7 @@
 #include "../Components/KeyboardControlComponent.h"
 #include "../Components/ProjectileEmmitterComponent.h"
 #include "../Components/CameraFollowComponent.h"
+#include "../Components/HealthComponent.h"
 #include "../Systems/MovementSystem.h"
 #include "../Systems/RenderSystem.h"
 #include "../Systems/DamageSystem.h"
@@ -21,6 +22,7 @@
 #include "../Systems/CollisionSystem.h"
 #include "../Systems/CameraMovementSystem.h"
 #include "../Systems/ProjectileEmitSystem.h"
+#include "../Systems/ProjectileLifecycleSystem.h"
 #include "../AssetStore/AssetStore.h"
 #include <vector>
 #include <fstream>
@@ -150,6 +152,7 @@ void Game::LoadLevel(int level)
     registry->AddSystem<KeyboardControlSystem>();
     registry->AddSystem<CameraMovementSystem>();
     registry->AddSystem<ProjectileEmitSystem>();
+    registry->AddSystem<ProjectileLifecycleSystem>();
 
     assetStore->AddTexture(renderer, "tank-image", "./assets/images/tank-panther-right.png");
     assetStore->AddTexture(renderer, "truck-image", "./assets/images/truck-ford-right.png");
@@ -194,6 +197,8 @@ void Game::LoadLevel(int level)
     chopper.AddComponent<AnimationComponent>(2, 5, true);
     chopper.AddComponent<KeyboardControlComponent>(glm::vec2(0.0, -40.0), glm::vec2(40.0, 0.0), glm::vec2(0.0, 40.0), glm::vec2(-40.0, 0.0));
     chopper.AddComponent<CameraFollowComponent>();
+    chopper.AddComponent<HealthComponent>(100);
+    chopper.AddComponent<ProjectileEmitterComponent>(glm::vec2(0.0, 100.0), 2000, 10000, true, 10);
 
     Entity tank = registry->CreateEntity();
 
@@ -202,6 +207,7 @@ void Game::LoadLevel(int level)
     tank.AddComponent<SpriteComponent>("tank-image", TILE_SIZE, TILE_SIZE, 2);
     tank.AddComponent<BoxColliderComponent>(TILE_SIZE, TILE_SIZE);
     tank.AddComponent<ProjectileEmitterComponent>(glm::vec2(100.0, 0.0), 5000, 10000, false, 10);
+    tank.AddComponent<HealthComponent>(100);
 
     Entity truck = registry->CreateEntity();
     truck.AddComponent<TransformComponent>(glm::vec2(10.0, 10.0), glm::vec2(1.0, 1.0), 0.0);
@@ -209,6 +215,7 @@ void Game::LoadLevel(int level)
     truck.AddComponent<SpriteComponent>("truck-image", TILE_SIZE, TILE_SIZE, 1);
     truck.AddComponent<BoxColliderComponent>(TILE_SIZE, TILE_SIZE);
     truck.AddComponent<ProjectileEmitterComponent>(glm::vec2(0.0, 100.0), 2000, 10000, false, 10);
+    truck.AddComponent<HealthComponent>(100);
 
     Entity radar = registry->CreateEntity();
     radar.AddComponent<TransformComponent>(glm::vec2(windowWidth - 74, 10.0), glm::vec2(1.0, 1.0), 0.0);
@@ -246,6 +253,7 @@ void Game::Update()
     registry->GetSystem<CollisionSystem>().Update(eventBus);
     registry->GetSystem<CameraMovementSystem>().Update(camera);
     registry->GetSystem<ProjectileEmitSystem>().Update(registry);
+    registry->GetSystem<ProjectileLifecycleSystem>().Update();
 
     // Update the registry to process the entities that are waiting to be created/deleted
     registry->Update();
