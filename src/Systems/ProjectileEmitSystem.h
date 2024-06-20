@@ -31,9 +31,10 @@ public:
     {
         if (event.key == SDLK_SPACE)
         {
-            for (auto entity : GetSystemEntities())
+            Logger::Err("Space key pressed");
+            mak for (auto entity : GetSystemEntities())
             {
-                if (entity.HasComponent<CameraFollowComponent>())
+                if (entity.HasComponent<CameraFollowComponent>()) // identify if the entity is the player
                 {
                     auto &emitter = entity.GetComponent<ProjectileEmitterComponent>();
                     const auto transform = entity.GetComponent<TransformComponent>();
@@ -96,6 +97,10 @@ public:
         {
             auto &emitter = entity.GetComponent<ProjectileEmitterComponent>();
             const auto transform = entity.GetComponent<TransformComponent>();
+
+            if (emitter.frequency == 0)
+                continue;
+
             if (SDL_GetTicks() - emitter.lastEmmissionTime > emitter.frequency)
             {
 
