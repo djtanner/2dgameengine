@@ -32,7 +32,7 @@ public:
         if (event.key == SDLK_SPACE)
         {
             Logger::Err("Space key pressed");
-            mak for (auto entity : GetSystemEntities())
+            for (auto entity : GetSystemEntities())
             {
                 if (entity.HasComponent<CameraFollowComponent>()) // identify if the entity is the player
                 {
