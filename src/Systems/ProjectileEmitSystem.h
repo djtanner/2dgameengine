@@ -14,6 +14,17 @@
 
 class ProjectileEmitSystem : public System
 {
+
+private:
+    void AddComponents(Entity &projectile, ProjectileEmitterComponent &emitter, TransformComponent transform, glm::vec2 projectileVelocity, glm::vec2 projectilePosition)
+    {
+        projectile.AddComponent<TransformComponent>(projectilePosition, glm::vec2(1.0, 1.0), 0);
+        projectile.AddComponent<RigidBodyComponent>(projectileVelocity);
+        projectile.AddComponent<SpriteComponent>("projectile", 4, 4, 4);
+        projectile.AddComponent<BoxColliderComponent>(4, 4);
+        projectile.AddComponent<ProjectileComponent>(emitter.isFriendly, emitter.hitPercentageDamage, emitter.projectileDuration);
+    }
+
 public:
     ProjectileEmitSystem()
     {
@@ -75,11 +86,8 @@ public:
 
                         // add projectile to the registry
                         auto projectile = entity.registry->CreateEntity();
-                        projectile.AddComponent<TransformComponent>(projectilePosition, glm::vec2(1.0, 1.0), 0);
-                        projectile.AddComponent<RigidBodyComponent>(projectileVelocity);
-                        projectile.AddComponent<SpriteComponent>("projectile", 4, 4, 4);
-                        projectile.AddComponent<BoxColliderComponent>(4, 4);
-                        projectile.AddComponent<ProjectileComponent>(emitter.isFriendly, emitter.hitPercentageDamage, emitter.projectileDuration);
+
+                        AddComponents(projectile, emitter, transform, projectileVelocity, projectilePosition);
 
                         // Logger::Err("Projectile emitted");
 
@@ -92,7 +100,6 @@ public:
 
     void Update(std::unique_ptr<Registry> &registry)
     {
-
         for (auto entity : GetSystemEntities())
         {
             auto &emitter = entity.GetComponent<ProjectileEmitterComponent>();
@@ -113,11 +120,8 @@ public:
                 }
                 // add projectile to the registry
                 auto projectile = registry->CreateEntity();
-                projectile.AddComponent<TransformComponent>(projectilePosition, glm::vec2(1.0, 1.0), 0);
-                projectile.AddComponent<RigidBodyComponent>(emitter.projectileVelocity);
-                projectile.AddComponent<SpriteComponent>("projectile", 4, 4, 4);
-                projectile.AddComponent<BoxColliderComponent>(4, 4);
-                projectile.AddComponent<ProjectileComponent>(emitter.isFriendly, emitter.hitPercentageDamage, emitter.projectileDuration);
+
+                AddComponents(projectile, emitter, transform, emitter.projectileVelocity, projectilePosition);
 
                 // Logger::Err("Projectile emitted");
 
