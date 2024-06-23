@@ -106,6 +106,13 @@ void Registry::Update()
         RemoveEntityFromSystems(entity);
         freeIds.push(entity.GetId());
 
+        // TODO : remove entity from component pool
+        for (std::shared_ptr<IPool> const &componentPool : componentPools)
+        {
+
+            componentPool->RemoveEntityFromPool(entity.GetId());
+                }
+
         entityComponentSignatures[entity.GetId()].reset();
     }
 

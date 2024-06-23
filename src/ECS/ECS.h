@@ -119,15 +119,14 @@ public:
 };
 
 /*A pool is just a vector of objects of type T*/
-
+using EntityId = int;
 // use IPool as a base class that is abstract so we don't have to specify the type of the pool
 class IPool
 {
 public:
     virtual ~IPool() = default;
+    virtual void RemoveEntityFromPool(EntityId entity) = 0;
 };
-
-using EntityId = int;
 
 template <typename T>
 class Pool : public IPool
@@ -166,6 +165,11 @@ public:
         return *(data[0]);
     }
 
+    void RemoveEntityFromPool(EntityId entity) override
+    {
+        data.erase(entity);
+    }
+
     // T &operator[](int index) { return data[index]; }
 };
 
@@ -190,7 +194,7 @@ private:
     // Vector of component pools
     // each pool contains all the data for a certain component type, each pool will be different types so use the abstract IPool
     // vector index is componenet ID, pool index = entity ID
-    std::vector<std::shared_ptr<void>> componentPools;
+    std::vector<std::shared_ptr<IPool>> componentPools;
 
     // Vector of component signatures
     // each signature represents the components an entity has
