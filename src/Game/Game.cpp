@@ -181,6 +181,7 @@ void Game::LoadLevel(int level)
             Entity tile = registry->CreateEntity();
             tile.AddComponent<TransformComponent>(glm::vec2(j * TILE_SIZE * TILE_SCALE, i * TILE_SIZE * TILE_SCALE), glm::vec2(TILE_SCALE, TILE_SCALE), 0.0);
             tile.AddComponent<SpriteComponent>("tilemap-sheet", TILE_SIZE, TILE_SIZE, 0, false, srcX, srcY);
+            tile.Group("tiles");
         }
     }
 
@@ -199,7 +200,7 @@ void Game::LoadLevel(int level)
     chopper.AddComponent<CameraFollowComponent>();
     chopper.AddComponent<HealthComponent>(100);
     chopper.AddComponent<ProjectileEmitterComponent>(glm::vec2(150.0, 150.0), 0, 10000, true, 0);
-
+    chopper.Tag("player");
     Entity tank = registry->CreateEntity();
 
     tank.AddComponent<TransformComponent>(glm::vec2(500.0, 10.0), glm::vec2(1.0, 1.0), 0.0);
@@ -208,6 +209,7 @@ void Game::LoadLevel(int level)
     tank.AddComponent<BoxColliderComponent>(TILE_SIZE, TILE_SIZE);
     // tank.AddComponent<ProjectileEmitterComponent>(glm::vec2(100.0, 0.0), 5000, 10000, false, 10);
     tank.AddComponent<HealthComponent>(100);
+    tank.Group("enemies");
 
     Entity truck = registry->CreateEntity();
     truck.AddComponent<TransformComponent>(glm::vec2(10.0, 10.0), glm::vec2(1.0, 1.0), 0.0);
@@ -216,6 +218,7 @@ void Game::LoadLevel(int level)
     truck.AddComponent<BoxColliderComponent>(TILE_SIZE, TILE_SIZE);
     // truck.AddComponent<ProjectileEmitterComponent>(glm::vec2(0.0, 100.0), 2000, 10000, false, 10);
     truck.AddComponent<HealthComponent>(100);
+    truck.Group("enemies");
 
     Entity radar = registry->CreateEntity();
     radar.AddComponent<TransformComponent>(glm::vec2(windowWidth - 74, 10.0), glm::vec2(1.0, 1.0), 0.0);

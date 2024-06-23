@@ -16,13 +16,23 @@ class ProjectileEmitSystem : public System
 {
 
 private:
-    void AddComponents(Entity &projectile, ProjectileEmitterComponent &emitter, TransformComponent transform, glm::vec2 projectileVelocity, glm::vec2 projectilePosition)
+    void AddComponents(Entity &entity, Entity &projectile, ProjectileEmitterComponent &emitter, TransformComponent transform, glm::vec2 projectileVelocity, glm::vec2 projectilePosition)
     {
         projectile.AddComponent<TransformComponent>(projectilePosition, glm::vec2(1.0, 1.0), 0);
         projectile.AddComponent<RigidBodyComponent>(projectileVelocity);
         projectile.AddComponent<SpriteComponent>("projectile", 4, 4, 4);
         projectile.AddComponent<BoxColliderComponent>(4, 4);
         projectile.AddComponent<ProjectileComponent>(emitter.isFriendly, emitter.hitPercentageDamage, emitter.projectileDuration);
+    }
+
+    void setProjectilePosition(Entity &entity, glm::vec2 &projectilePosition, TransformComponent transform)
+    {
+        if (entity.HasComponent<SpriteComponent>())
+        {
+            const auto sprite = entity.GetComponent<SpriteComponent>();
+            projectilePosition.x += (transform.scale.x * sprite.width / 2);
+            projectilePosition.y += (transform.scale.y * sprite.height / 2);
+        }
     }
 
 public:
@@ -54,12 +64,15 @@ public:
                     {
 
                         glm::vec2 projectilePosition = transform.position;
-                        if (entity.HasComponent<SpriteComponent>())
-                        {
-                            const auto sprite = entity.GetComponent<SpriteComponent>();
-                            projectilePosition.x += (transform.scale.x * sprite.width / 2);
-                            projectilePosition.y += (transform.scale.y * sprite.height / 2);
-                        }
+
+                        setProjectilePosition(entity, projectilePosition, transform);
+
+                        /* if (entity.HasComponent<SpriteComponent>())
+                         {
+                             const auto sprite = entity.GetComponent<SpriteComponent>();
+                             projectilePosition.x += (transform.scale.x * sprite.width / 2);
+                             projectilePosition.y += (transform.scale.y * sprite.height / 2);
+                         }*/
 
                         // shoot the projectile in the direction of the entity
                         glm::vec2 projectileVelocity = emitter.projectileVelocity;
@@ -87,7 +100,7 @@ public:
                         // add projectile to the registry
                         auto projectile = entity.registry->CreateEntity();
 
-                        AddComponents(projectile, emitter, transform, projectileVelocity, projectilePosition);
+                        AddComponents(entity, projectile, emitter, transform, projectileVelocity, projectilePosition);
 
                         // Logger::Err("Projectile emitted");
 
@@ -121,7 +134,7 @@ public:
                 // add projectile to the registry
                 auto projectile = registry->CreateEntity();
 
-                AddComponents(projectile, emitter, transform, emitter.projectileVelocity, projectilePosition);
+                AddComponents(entity, projectile, emitter, transform, emitter.projectileVelocity, projectilePosition);
 
                 // Logger::Err("Projectile emitted");
 

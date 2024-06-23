@@ -46,8 +46,14 @@ private:
 
 public:
     Entity(int id) : id(id){};
+    Entity(const Entity &entity) = default;
     void Kill();
     int GetId() const;
+
+    void Tag(const std::string &tag);
+    bool HasTag(const std::string &tag) const;
+    void Group(const std::string &group);
+    bool BelongsToGroup(const std::string &group) const;
 
     bool operator==(const Entity &other) const
     {
@@ -150,6 +156,14 @@ private:
     std::set<Entity> entitiesToBeAdded;
     std::set<Entity> entitiesToBeKilled;
 
+    // maps for groups and tags
+
+    std::unordered_map<std::string, Entity> entityPerTag;
+    std::unordered_map<int, std::string> tagPerEntity;
+
+    std::unordered_map<int, std::string> groupPerEntity;
+    std::unordered_map<std::string, std::set<Entity>> entitiesPerGroup;
+
     // Vector of component pools
     // each pool contains all the data for a certain component type, each pool will be different types so use the abstract IPool
     // vector index is componenet ID, pool index = entity ID
@@ -180,6 +194,18 @@ public:
     void KillEntity(Entity entity);
     void AddEntityToSystems(Entity entity);
     void RemoveEntityFromSystems(Entity entity);
+
+    // Tags
+    void TagEntity(Entity entity, const std::string &tag);
+    bool EntityHasTag(Entity entity, const std::string &tag) const;
+    Entity GetEntityByTag(const std::string &tag) const;
+    void RemoveEntityTag(Entity entity);
+
+    // Groups
+    void GroupEntity(Entity entity, const std::string &group);
+    bool EntityBelongsToGroup(Entity entity, const std::string &group) const;
+    std::set<Entity> GetEntitiesByGroup(const std::string &group) const;
+    void RemoveEntityFromGroup(Entity entity);
 
     ////////////////////////////////////////////////////////////////////////////////////////////
     // Components
