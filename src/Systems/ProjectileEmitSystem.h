@@ -11,6 +11,7 @@
 #include "../Logger/Logger.h"
 #include "../Events/KeyPressedEvent.h"
 #include "../EventBus/EventBus.h"
+#include <iostream>
 
 class ProjectileEmitSystem : public System
 {
@@ -22,8 +23,8 @@ private:
         projectile.AddComponent<RigidBodyComponent>(projectileVelocity);
         projectile.AddComponent<SpriteComponent>("projectile", 4, 4, 4);
         projectile.AddComponent<BoxColliderComponent>(4, 4);
-        projectile.AddComponent<ProjectileComponent>(emitter.isFriendly, emitter.hitPercentageDamage, emitter.projectileDuration);
-    }
+        projectile.AddComponent<ProjectileComponent>(emitter.isFriendly, emitter.hitPercentageDamage, emitter.projectileDuration, entity.GetId());
+        }
 
     void setProjectilePosition(Entity &entity, glm::vec2 &projectilePosition, TransformComponent transform)
     {
@@ -55,7 +56,7 @@ public:
             Logger::Err("Space key pressed");
             for (auto entity : GetSystemEntities())
             {
-                if (entity.HasComponent<CameraFollowComponent>()) // identify if the entity is the player
+                if (entity.HasTag("player")) // identify if the entity is the player
                 {
                     auto &emitter = entity.GetComponent<ProjectileEmitterComponent>();
                     const auto transform = entity.GetComponent<TransformComponent>();
@@ -66,13 +67,6 @@ public:
                         glm::vec2 projectilePosition = transform.position;
 
                         setProjectilePosition(entity, projectilePosition, transform);
-
-                        /* if (entity.HasComponent<SpriteComponent>())
-                         {
-                             const auto sprite = entity.GetComponent<SpriteComponent>();
-                             projectilePosition.x += (transform.scale.x * sprite.width / 2);
-                             projectilePosition.y += (transform.scale.y * sprite.height / 2);
-                         }*/
 
                         // shoot the projectile in the direction of the entity
                         glm::vec2 projectileVelocity = emitter.projectileVelocity;
@@ -100,9 +94,8 @@ public:
                         // add projectile to the registry
                         auto projectile = entity.registry->CreateEntity();
 
+                        projectile.Group("projectiles");
                         AddComponents(entity, projectile, emitter, transform, projectileVelocity, projectilePosition);
-
-                        // Logger::Err("Projectile emitted");
 
                         emitter.lastEmmissionTime = SDL_GetTicks();
                     }
@@ -133,6 +126,7 @@ public:
                 }
                 // add projectile to the registry
                 auto projectile = registry->CreateEntity();
+                projectile.Group("projectiles");
 
                 AddComponents(entity, projectile, emitter, transform, emitter.projectileVelocity, projectilePosition);
 

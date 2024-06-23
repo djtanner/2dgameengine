@@ -172,7 +172,8 @@ void Registry::GroupEntity(Entity entity, const std::string &group)
 
 bool Registry::EntityBelongsToGroup(Entity entity, const std::string &group) const
 {
-    return groupPerEntity.find(entity.GetId()) != groupPerEntity.end();
+    auto groupEntities = entitiesPerGroup.at(group);
+    return groupEntities.find(entity.GetId()) != groupEntities.end();
 }
 
 std::set<Entity> Registry::GetEntitiesByGroup(const std::string &group) const
