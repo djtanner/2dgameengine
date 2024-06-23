@@ -5,5 +5,8 @@
       "titleBar.activeForeground": "#b5e90a"
     }
   },
-  "window.titleBarStyle": "custom"
+  "window.titleBarStyle": "custom",
+  "files.associations": {
+    "unordered_map": "cpp"
+  }
 }

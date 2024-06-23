@@ -8,6 +8,7 @@
 #include "../Logger/Logger.h"
 #include <iostream>
 #include <queue>
+#include <unordered_set>
 
 const unsigned int MAX_COMPONENTS = 32;
 
@@ -126,24 +127,46 @@ public:
     virtual ~IPool() = default;
 };
 
+using EntityId = int;
+
 template <typename T>
 class Pool : public IPool
 {
 private:
-    std::vector<T> data;
+    // Pool is a map with key as entity ID and value as a pointer to the component
+    std::unordered_map<EntityId, std::unique_ptr<T>> data;
 
 public:
-    Pool(int size = 100) { Resize(size); }
+    Pool() = default;
     virtual ~Pool() = default;
 
     bool IsEmpty() const { return data.empty(); }
     int GetSize() const { return data.size(); }
-    void Resize(int size) { data.resize(size); }
+    // void Resize(int size) { data.resize(size); }
     void Clear() { data.clear(); }
-    void Add(const T &component) { data.push_back(component); }
-    void Set(int index, const T &object) { data[index] = object; }
-    T &Get(int index) { return static_cast<T &>(data[index]); }
-    T &operator[](int index) { return data[index]; }
+    void Add(EntityId entity, const T &component)
+    {
+        data[entity] = std::make_unique<T>(component);
+    }
+
+    void Set(EntityId entity, const T &component)
+    {
+        data[entity] = std::make_unique<T>(component);
+    }
+
+    // Get the component associated with an entity
+    T &Get(EntityId entity)
+    {
+        auto it = data.find(entity);
+        if (it != data.end())
+        {
+            return *(it->second);
+        }
+        Logger::Err("Component not found");
+        return *(data[0]);
+    }
+
+    // T &operator[](int index) { return data[index]; }
 };
 
 /*Manages the creation and destruction of entites, as well as adding systems and adding componenets to entities*/
@@ -167,7 +190,7 @@ private:
     // Vector of component pools
     // each pool contains all the data for a certain component type, each pool will be different types so use the abstract IPool
     // vector index is componenet ID, pool index = entity ID
-    std::vector<std::shared_ptr<IPool>> componentPools;
+    std::vector<std::shared_ptr<void>> componentPools;
 
     // Vector of component signatures
     // each signature represents the components an entity has
@@ -271,10 +294,6 @@ void Registry::AddComponent(Entity entity, TArgs &&...args)
     }
 
     std::shared_ptr<Pool<TComponent>> componentPool = std::static_pointer_cast<Pool<TComponent>>(componentPools[componentId]);
-    if (entityId >= componentPool->GetSize())
-    {
-        componentPool->Resize(numEntities);
-    }
 
     // Add component to pool
 
@@ -311,10 +330,8 @@ template <typename TComponent>
 TComponent &Registry::GetComponent(Entity entity) const
 {
     const auto componentId = Component<TComponent>::GetId();
-    const auto entityId = entity.GetId();
-
     auto componentPool = std::static_pointer_cast<Pool<TComponent>>(componentPools[componentId]);
-    return componentPool->Get(entityId);
+    return componentPool->Get(entity.GetId());
 }
 
 // Implementation of Systems templates
