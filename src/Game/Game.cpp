@@ -307,10 +307,12 @@ void Game::Render()
     registry->GetSystem<RenderTextSystem>().Update(renderer, assetStore, camera);
     registry->GetSystem<RenderHealthUISystem>().Update(renderer, assetStore, camera);
 
-    ImGui::ShowDemoWindow();
+    if (renderColliders)
+    {
+        ImGui::ShowDemoWindow();
+    }
     ImGui::Render();
     ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData(), renderer);
-
     SDL_RenderPresent(renderer);
 }
 
