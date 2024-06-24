@@ -13,6 +13,7 @@
 #include "../Components/KeyboardControlComponent.h"
 #include "../Components/ProjectileEmmitterComponent.h"
 #include "../Components/CameraFollowComponent.h"
+#include "../Components/UILabelComponent.h"
 #include "../Components/HealthComponent.h"
 #include "../Systems/MovementSystem.h"
 #include "../Systems/RenderSystem.h"
@@ -23,6 +24,7 @@
 #include "../Systems/CameraMovementSystem.h"
 #include "../Systems/ProjectileEmitSystem.h"
 #include "../Systems/ProjectileLifecycleSystem.h"
+#include "../Systems/RenderTextSystem.h"
 #include "../AssetStore/AssetStore.h"
 #include <vector>
 #include <fstream>
@@ -55,6 +57,13 @@ void Game::Initialize()
         Logger::Err("Error initializing SDL");
         return;
     }
+
+    if (TTF_Init() != 0)
+    {
+        Logger::Err("Error initializing SDL TTF");
+        return;
+    }
+
     SDL_DisplayMode displayMode;
     SDL_GetCurrentDisplayMode(0, &displayMode);
     windowWidth = 800;  // displayMode.w;
@@ -153,6 +162,7 @@ void Game::LoadLevel(int level)
     registry->AddSystem<CameraMovementSystem>();
     registry->AddSystem<ProjectileEmitSystem>();
     registry->AddSystem<ProjectileLifecycleSystem>();
+    registry->AddSystem<RenderTextSystem>();
 
     assetStore->AddTexture(renderer, "tank-image", "./assets/images/tank-panther-right.png");
     assetStore->AddTexture(renderer, "truck-image", "./assets/images/truck-ford-right.png");
@@ -160,6 +170,7 @@ void Game::LoadLevel(int level)
     assetStore->AddTexture(renderer, "chopper-image", "./assets/images/chopper-spritesheet.png");
     assetStore->AddTexture(renderer, "radar-image", "./assets/images/radar.png");
     assetStore->AddTexture(renderer, "projectile", "./assets/images/bullet.png");
+    assetStore->AddFont("arial-font", "./assets/fonts/arial.ttf", 16);
 
     std::vector<std::vector<int>> tilemap;
     // parse the tilemap file and create a map of the tiles
@@ -179,7 +190,7 @@ void Game::LoadLevel(int level)
             int srcY = (val / 10) * TILE_SIZE;
 
             Entity tile = registry->CreateEntity();
-            tile.AddComponent<TransformComponent>(glm::vec2(j * TILE_SIZE * TILE_SCALE, i * TILE_SIZE * TILE_SCALE), glm::vec2(TILE_SCALE, TILE_SCALE), 0.0);
+            tile.AddComponent<TransformComponent>(glm::vec2(j * TILE_SIZE * TILE_SCALE, i * TILE_SIZE * TILE_SCALE), glm::vec2(TILE_SCALE, TILE_SCALE), 0.0, false);
             tile.AddComponent<SpriteComponent>("tilemap-sheet", TILE_SIZE, TILE_SIZE, 0, false, srcX, srcY);
             tile.Group("tiles");
         }
@@ -203,7 +214,7 @@ void Game::LoadLevel(int level)
     chopper.Tag("player");
 
     Entity tank = registry->CreateEntity();
-    tank.AddComponent<TransformComponent>(glm::vec2(500.0, 10.0), glm::vec2(1.0, 1.0), 0.0);
+    tank.AddComponent<TransformComponent>(glm::vec2(500.0, 10.0), glm::vec2(1.0, 1.0), 0.0, false);
     tank.AddComponent<RigidBodyComponent>(glm::vec2(-30.0, 0.0));
     tank.AddComponent<SpriteComponent>("tank-image", TILE_SIZE, TILE_SIZE, 2);
     tank.AddComponent<BoxColliderComponent>(TILE_SIZE, TILE_SIZE);
@@ -212,7 +223,7 @@ void Game::LoadLevel(int level)
     tank.Group("enemies");
 
     Entity truck = registry->CreateEntity();
-    truck.AddComponent<TransformComponent>(glm::vec2(10.0, 10.0), glm::vec2(1.0, 1.0), 0.0);
+    truck.AddComponent<TransformComponent>(glm::vec2(10.0, 10.0), glm::vec2(1.0, 1.0), 0.0, false);
     truck.AddComponent<RigidBodyComponent>(glm::vec2(20.0, 0.0));
     truck.AddComponent<SpriteComponent>("truck-image", TILE_SIZE, TILE_SIZE, 1);
     truck.AddComponent<BoxColliderComponent>(TILE_SIZE, TILE_SIZE);
@@ -221,10 +232,15 @@ void Game::LoadLevel(int level)
     truck.Group("enemies");
 
     Entity radar = registry->CreateEntity();
-    radar.AddComponent<TransformComponent>(glm::vec2(windowWidth - 74, 10.0), glm::vec2(1.0, 1.0), 0.0);
+    radar.AddComponent<TransformComponent>(glm::vec2(windowWidth - 74, 10.0), glm::vec2(1.0, 1.0), 0.0, true);
     radar.AddComponent<RigidBodyComponent>(glm::vec2(0.0, 0.0));
     radar.AddComponent<SpriteComponent>("radar-image", TILE_SIZE * 2, TILE_SIZE * 2, 1, true);
     radar.AddComponent<AnimationComponent>(8, 5, true);
+
+    Entity label = registry->CreateEntity();
+    label.AddComponent<TransformComponent>(glm::vec2(100.0, 100.0), glm::vec2(1.0, 1.0), 0.0, true);
+    label.AddComponent<UILabelComponent>("Health: 100", "arial-font", SDL_Color{255, 255, 255, 255});
+    label.Group("ui");
 }
 
 void Game::Setup()
@@ -270,6 +286,7 @@ void Game::Render()
 
     // registry->GetSystem<RenderSystem>().Update(renderer, std::make_unique<AssetStore> & assetStore);
     registry->GetSystem<RenderSystem>().Update(renderer, assetStore, renderColliders, camera);
+    registry->GetSystem<RenderTextSystem>().Update(renderer, assetStore, camera);
     SDL_RenderPresent(renderer);
 }
 
