@@ -3,6 +3,9 @@
 #include <SDL2/SDL.h>
 #include <glm/glm.hpp>
 #include <SDL2/SDL_image.h>
+#include <imgui/imgui.h>
+#include <imgui/imgui_impl_sdl2.h>
+#include <imgui/imgui_impl_sdlrenderer2.h>
 #include "../Logger/Logger.h"
 #include "../ECS/ECS.h"
 #include "../Components/TransformComponent.h"
@@ -85,6 +88,14 @@ void Game::Initialize()
         Logger::Err("Error creating SDL renderer");
         return;
     }
+
+    IMGUI_CHECKVERSION();
+
+    ImGui::CreateContext();
+
+    ImGui_ImplSDL2_InitForSDLRenderer(window, renderer);
+
+    ImGui_ImplSDLRenderer2_Init(renderer);
 
     // Initialize camera view with entire screen area
     camera = {0, 0, windowWidth, windowHeight};
@@ -284,6 +295,10 @@ void Game::Update()
 
 void Game::Render()
 {
+    ImGui_ImplSDLRenderer2_NewFrame();
+    ImGui_ImplSDL2_NewFrame();
+    ImGui::NewFrame();
+
     SDL_SetRenderDrawColor(renderer, 21, 21, 21, 255);
     SDL_RenderClear(renderer);
 
@@ -291,6 +306,11 @@ void Game::Render()
     registry->GetSystem<RenderSystem>().Update(renderer, assetStore, renderColliders, camera);
     registry->GetSystem<RenderTextSystem>().Update(renderer, assetStore, camera);
     registry->GetSystem<RenderHealthUISystem>().Update(renderer, assetStore, camera);
+
+    ImGui::ShowDemoWindow();
+    ImGui::Render();
+    ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData(), renderer);
+
     SDL_RenderPresent(renderer);
 }
 
@@ -307,6 +327,10 @@ void Game::Run()
 
 void Game::Destroy()
 {
+    ImGui_ImplSDLRenderer2_Shutdown();
+    ImGui_ImplSDL2_Shutdown();
+    ImGui::DestroyContext();
+
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     SDL_Quit();
