@@ -25,6 +25,7 @@
 #include "../Systems/ProjectileEmitSystem.h"
 #include "../Systems/ProjectileLifecycleSystem.h"
 #include "../Systems/RenderTextSystem.h"
+#include "../Systems/RenderHealthUISystem.h"
 #include "../AssetStore/AssetStore.h"
 #include <vector>
 #include <fstream>
@@ -163,6 +164,7 @@ void Game::LoadLevel(int level)
     registry->AddSystem<ProjectileEmitSystem>();
     registry->AddSystem<ProjectileLifecycleSystem>();
     registry->AddSystem<RenderTextSystem>();
+    registry->AddSystem<RenderHealthUISystem>();
 
     assetStore->AddTexture(renderer, "tank-image", "./assets/images/tank-panther-right.png");
     assetStore->AddTexture(renderer, "truck-image", "./assets/images/truck-ford-right.png");
@@ -171,6 +173,7 @@ void Game::LoadLevel(int level)
     assetStore->AddTexture(renderer, "radar-image", "./assets/images/radar.png");
     assetStore->AddTexture(renderer, "projectile", "./assets/images/bullet.png");
     assetStore->AddFont("arial-font", "./assets/fonts/arial.ttf", 16);
+    assetStore->AddFont("charriot-font", "./assets/fonts/charriot.ttf", 24);
 
     std::vector<std::vector<int>> tilemap;
     // parse the tilemap file and create a map of the tiles
@@ -222,6 +225,11 @@ void Game::LoadLevel(int level)
     tank.AddComponent<HealthComponent>(100);
     tank.Group("enemies");
 
+    /*Entity tankLabel = registry->CreateEntity();
+    tankLabel.AddComponent<TransformComponent>(glm::vec2(100.0, 100.0), glm::vec2(1.0, 1.0), 0.0, true);
+    tankLabel.AddComponent<UILabelComponent>("Health: " + std::to_string(tank.GetComponent<HealthComponent>().health), "arial-font", SDL_Color{255, 255, 255, 255}, tank.GetId());
+    tankLabel.Group("UIHealth");*/
+
     Entity truck = registry->CreateEntity();
     truck.AddComponent<TransformComponent>(glm::vec2(10.0, 10.0), glm::vec2(1.0, 1.0), 0.0, false);
     truck.AddComponent<RigidBodyComponent>(glm::vec2(20.0, 0.0));
@@ -236,11 +244,6 @@ void Game::LoadLevel(int level)
     radar.AddComponent<RigidBodyComponent>(glm::vec2(0.0, 0.0));
     radar.AddComponent<SpriteComponent>("radar-image", TILE_SIZE * 2, TILE_SIZE * 2, 1, true);
     radar.AddComponent<AnimationComponent>(8, 5, true);
-
-    Entity label = registry->CreateEntity();
-    label.AddComponent<TransformComponent>(glm::vec2(100.0, 100.0), glm::vec2(1.0, 1.0), 0.0, true);
-    label.AddComponent<UILabelComponent>("Health: 100", "arial-font", SDL_Color{255, 255, 255, 255});
-    label.Group("ui");
 }
 
 void Game::Setup()
@@ -287,6 +290,7 @@ void Game::Render()
     // registry->GetSystem<RenderSystem>().Update(renderer, std::make_unique<AssetStore> & assetStore);
     registry->GetSystem<RenderSystem>().Update(renderer, assetStore, renderColliders, camera);
     registry->GetSystem<RenderTextSystem>().Update(renderer, assetStore, camera);
+    registry->GetSystem<RenderHealthUISystem>().Update(renderer, assetStore, camera);
     SDL_RenderPresent(renderer);
 }
 
