@@ -34,6 +34,7 @@
 #include <vector>
 #include <fstream>
 #include <sstream>
+#include <iostream>
 
 int Game::windowWidth;
 int Game::windowHeight;
@@ -311,7 +312,7 @@ void Game::Render()
     if (renderColliders)
     {
         registry->GetSystem<RenderGuiSystem>().Update(renderer);
-        }
+    }
 
     SDL_RenderPresent(renderer);
 }
