@@ -29,6 +29,7 @@
 #include "../Systems/ProjectileLifecycleSystem.h"
 #include "../Systems/RenderTextSystem.h"
 #include "../Systems/RenderHealthUISystem.h"
+#include "../Systems/RenderGuiSystem.h"
 #include "../AssetStore/AssetStore.h"
 #include <vector>
 #include <fstream>
@@ -70,7 +71,7 @@ void Game::Initialize()
 
     SDL_DisplayMode displayMode;
     SDL_GetCurrentDisplayMode(0, &displayMode);
-    windowWidth = 800;  // displayMode.w;
+    windowWidth = 1200; // displayMode.w;
     windowHeight = 600; // displayMode.h;
 
     window = SDL_CreateWindow(NULL, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, windowWidth, windowHeight, SDL_WINDOW_BORDERLESS);
@@ -110,6 +111,8 @@ void Game::ProcessInput()
     SDL_Event sdlEvent;
     while (SDL_PollEvent(&sdlEvent))
     {
+        ImGui_ImplSDL2_ProcessEvent(&sdlEvent);
+
         switch (sdlEvent.type)
         {
         case SDL_QUIT:
@@ -176,6 +179,7 @@ void Game::LoadLevel(int level)
     registry->AddSystem<ProjectileLifecycleSystem>();
     registry->AddSystem<RenderTextSystem>();
     registry->AddSystem<RenderHealthUISystem>();
+    registry->AddSystem<RenderGuiSystem>();
 
     assetStore->AddTexture(renderer, "tank-image", "./assets/images/tank-panther-right.png");
     assetStore->AddTexture(renderer, "truck-image", "./assets/images/truck-ford-right.png");
@@ -295,9 +299,6 @@ void Game::Update()
 
 void Game::Render()
 {
-    ImGui_ImplSDLRenderer2_NewFrame();
-    ImGui_ImplSDL2_NewFrame();
-    ImGui::NewFrame();
 
     SDL_SetRenderDrawColor(renderer, 21, 21, 21, 255);
     SDL_RenderClear(renderer);
@@ -309,10 +310,9 @@ void Game::Render()
 
     if (renderColliders)
     {
-        ImGui::ShowDemoWindow();
-    }
-    ImGui::Render();
-    ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData(), renderer);
+        registry->GetSystem<RenderGuiSystem>().Update(renderer);
+        }
+
     SDL_RenderPresent(renderer);
 }
 
