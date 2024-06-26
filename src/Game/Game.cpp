@@ -234,7 +234,7 @@ void Game::LoadLevel(int level)
 
     Entity tank = registry->CreateEntity();
     tank.AddComponent<TransformComponent>(glm::vec2(500.0, 10.0), glm::vec2(1.0, 1.0), 0.0, false);
-    tank.AddComponent<RigidBodyComponent>(glm::vec2(-30.0, 0.0));
+    tank.AddComponent<RigidBodyComponent>(glm::vec2(-30.0, 0));
     tank.AddComponent<SpriteComponent>("tank-image", TILE_SIZE, TILE_SIZE, 2);
     tank.AddComponent<BoxColliderComponent>(TILE_SIZE, TILE_SIZE);
     tank.AddComponent<ProjectileEmitterComponent>(glm::vec2(100.0, 0.0), 5000, 10000, false, 10);

@@ -26,11 +26,11 @@ public:
     {
         Logger::Log("Entity " + std::to_string(event.entity1.GetId()) + " collided with entity " + std::to_string(event.entity2.GetId()));
 
-        if (event.entity2.BelongsToGroup("projectiles") && !event.entity1.BelongsToGroup("projectiles"))
+        if (event.entity2.HasComponent<ProjectileComponent>() && !event.entity1.HasComponent<ProjectileComponent>())
         {
             OnProjectileHit(event.entity1, event.entity2);
         }
-        if (event.entity1.BelongsToGroup("projectiles") && !event.entity2.BelongsToGroup("projectiles"))
+        if (event.entity1.HasComponent<ProjectileComponent>() && !event.entity2.HasComponent<ProjectileComponent>())
         {
             OnProjectileHit(event.entity2, event.entity1);
         }
@@ -39,18 +39,21 @@ public:
     void OnProjectileHit(Entity &entity, Entity &projectile)
     {
         auto &health = entity.GetComponent<HealthComponent>();
-        auto projectileComponent = projectile.GetComponent<ProjectileComponent>();
-
-        if (!projectileComponent.isFriendly && projectileComponent.ownerEntityId != entity.GetId())
+        if (projectile.HasComponent<ProjectileComponent>())
         {
-            Logger::Err("Entity " + std::to_string(entity.GetId()) + " was hit by projectile " + std::to_string(projectile.GetId()));
-            health.health -= projectileComponent.damage;
+            auto projectileComponent = projectile.GetComponent<ProjectileComponent>();
 
-            if (health.health <= 0)
+            if (!projectileComponent.isFriendly && projectileComponent.ownerEntityId != entity.GetId())
             {
-                entity.Kill();
+                Logger::Err("Entity " + std::to_string(entity.GetId()) + " was hit by projectile " + std::to_string(projectile.GetId()));
+                health.health -= projectileComponent.damage;
+
+                if (health.health <= 0)
+                {
+                    entity.Kill();
+                }
+                projectile.Kill();
             }
-            projectile.Kill();
         }
     }
 
