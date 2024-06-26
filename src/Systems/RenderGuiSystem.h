@@ -10,7 +10,7 @@ class RenderGuiSystem : public System
 public:
     RenderGuiSystem() = default;
 
-    void Update(SDL_Renderer *renderer)
+    void Update(SDL_Renderer *renderer, std::unique_ptr<Registry> &registry)
     {
         ImVec4 red = ImVec4(1.0f, 0.0f, 0.0f, 1.0f);
         ImVec4 green = ImVec4(0.0f, 1.0f, 0.0f, 1.0f);
@@ -19,12 +19,24 @@ public:
         ImGui_ImplSDL2_NewFrame();
         ImGui::NewFrame();
 
-        ImGui::Begin("Window A");
-        ImGui::Text("This is window A");
-        ImGui::End();
+        ImGui::Begin("Spawn Enemies");
+        static int enemyXPos = 0;
+        static int enemyYPos = 0;
 
-        ImGui::Begin("Window B");
-        ImGui::Text("This is window B");
+        ImGui::InputInt("X Position", &enemyXPos);
+        ImGui::InputInt("Y Position", &enemyYPos);
+
+        if (ImGui::Button("Spawn Enemy"))
+        {
+            Entity tank = registry->CreateEntity();
+            tank.AddComponent<TransformComponent>(glm::vec2(enemyXPos, enemyYPos), glm::vec2(1.0, 1.0), 0.0, false);
+            tank.AddComponent<RigidBodyComponent>(glm::vec2(-30.0, 0.0));
+            tank.AddComponent<SpriteComponent>("tank-image", TILE_SIZE, TILE_SIZE, 2);
+            tank.AddComponent<BoxColliderComponent>(TILE_SIZE, TILE_SIZE);
+            tank.AddComponent<ProjectileEmitterComponent>(glm::vec2(100.0, 0.0), 5000, 10000, false, 10);
+            tank.AddComponent<HealthComponent>(100);
+            tank.Group("enemies");
+        }
         ImGui::End();
 
         ImGui::Begin("Logger");

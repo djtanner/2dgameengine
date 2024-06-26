@@ -311,7 +311,7 @@ void Game::Render()
 
     if (renderColliders)
     {
-        registry->GetSystem<RenderGuiSystem>().Update(renderer);
+        registry->GetSystem<RenderGuiSystem>().Update(renderer, registry);
     }
 
     SDL_RenderPresent(renderer);
