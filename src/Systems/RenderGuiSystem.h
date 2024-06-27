@@ -32,24 +32,73 @@ public:
         ImGui::Begin("Spawn Enemies");
         static int enemyXPos = 0;
         static int enemyYPos = 0;
+        static float enemyRotation = 0;
         static float enemySpeedX = 0.0f;
         static float enemySpeedY = 0.0f;
+        static float scaleX = 1.0;
+        static float scaleY = 1.0;
 
-        ImGui::InputInt("X Position", &enemyXPos);
-        ImGui::InputInt("Y Position", &enemyYPos);
-        // ImGui::InputFloat("Speed X", &enemySpeedX);
-        // ImGui::InputFloat("Speed Y", &enemySpeedY);
+        // Projectile Emitter variables
+        static bool emitBullets;
+        static float projectileVelocityX;
+        static float projectileVelocityY;
+        static int frequency;
+        static int projectileDuration; // ms to keep alive
+        static bool isFriendly;
+        static int hitPercentageDamage;
 
+        const char *sprites[] = {"tank-image", "truck-image"};
+        static int selectedSprite = 0;
+
+        // ImGui::SeparatorText("Enemy Sprite");
+        if (ImGui::CollapsingHeader("Enemy Sprite", ImGuiTreeNodeFlags_DefaultOpen))
+        {
+            ImGui::Combo("Sprite", &selectedSprite, sprites, IM_ARRAYSIZE(sprites));
+        }
+
+        //  ImGui::SeparatorText("Enemy Position");
+        if (ImGui::CollapsingHeader("Enemy Position", ImGuiTreeNodeFlags_DefaultOpen))
+        {
+            ImGui::InputInt("X Position", &enemyXPos);
+            ImGui::InputInt("Y Position", &enemyYPos);
+            ImGui::InputFloat("Rotation", &enemyRotation);
+            ImGui::InputFloat("Scale X", &scaleX);
+            ImGui::InputFloat("Scale Y", &scaleY);
+        }
+        // ImGui::SeparatorText("Enemy Speed");
+        if (ImGui::CollapsingHeader("Enemy Speed", ImGuiTreeNodeFlags_DefaultOpen))
+        {
+            ImGui::InputFloat("Speed X", &enemySpeedX);
+            ImGui::InputFloat("Speed Y", &enemySpeedY);
+        }
+
+        // ImGui::SeparatorText("Emit Bullets");
+        if (ImGui::CollapsingHeader("Emit Bullets", ImGuiTreeNodeFlags_DefaultOpen))
+        {
+
+            ImGui::Checkbox("Emit Bullets", &emitBullets);
+            ImGui::InputFloat("Bullet Velocity X", &projectileVelocityX);
+            ImGui::InputFloat("Bullet Velocity Y", &projectileVelocityY);
+            ImGui::InputInt("Frequency ms", &frequency);
+            ImGui::InputInt("Duration ms", &projectileDuration);
+            ImGui::Checkbox("Is Friendly", &isFriendly);
+            ImGui::InputInt("Hit Percentage Damage", &hitPercentageDamage);
+        }
         if (ImGui::Button("Spawn Enemy"))
         {
-            Entity tank = registry->CreateEntity();
-            tank.AddComponent<TransformComponent>(glm::vec2(enemyXPos, enemyYPos), glm::vec2(1.0, 1.0), 0.0, false);
-            tank.AddComponent<RigidBodyComponent>(glm::vec2(10.0, 0));
-            tank.AddComponent<SpriteComponent>("tank-image", TILE_SIZE, TILE_SIZE, 2);
-            tank.AddComponent<BoxColliderComponent>(TILE_SIZE, TILE_SIZE);
-            tank.AddComponent<ProjectileEmitterComponent>(glm::vec2(100.0, 0.0), 5000, 10000, false, 10);
-            tank.AddComponent<HealthComponent>(100);
-            tank.Group("enemies");
+            Entity enemy = registry->CreateEntity();
+            enemy.AddComponent<TransformComponent>(glm::vec2(enemyXPos, enemyYPos), glm::vec2(scaleX, scaleY), enemyRotation, false);
+            enemy.AddComponent<RigidBodyComponent>(glm::vec2(enemySpeedX, enemySpeedY));
+            enemy.AddComponent<SpriteComponent>(sprites[selectedSprite], TILE_SIZE, TILE_SIZE, 2);
+            enemy.AddComponent<BoxColliderComponent>(TILE_SIZE, TILE_SIZE);
+
+            if (emitBullets)
+            {
+                enemy.AddComponent<ProjectileEmitterComponent>(glm::vec2(projectileVelocityX, projectileVelocityY), frequency, projectileDuration, isFriendly, hitPercentageDamage);
+            }
+
+            enemy.AddComponent<HealthComponent>(100);
+            enemy.Group("enemies");
         }
         ImGui::End();
 
