@@ -20,6 +20,13 @@ private:
     SDL_Renderer *renderer;
     bool renderColliders = false;
     SDL_Rect camera;
+    SDL_GLContext GLContext;
+
+    // temp imgui functions
+    bool InitImGui();
+    void Begin();
+    void End();
+    void RenderImGui();
 
     void parseFile(std::string filename, std::vector<std::vector<int>> &tilemap);
     // entity manager
@@ -38,6 +45,7 @@ public:
     void Update();
     void Render();
     void Destroy();
+    inline SDL_GLContext &GetGLContext() { return GLContext; }
 
     static int windowWidth;
     static int windowHeight;

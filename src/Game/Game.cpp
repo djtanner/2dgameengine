@@ -6,6 +6,9 @@
 #include <imgui/imgui.h>
 #include <imgui/imgui_impl_sdl2.h>
 #include <imgui/imgui_impl_sdlrenderer2.h>
+#include <imgui/imgui_impl_opengl3.h>
+#include <imgui/imgui_internal.h>
+#include <SDL2/SDL_opengl.h>
 #include "../Logger/Logger.h"
 #include "../ECS/ECS.h"
 #include "../Components/TransformComponent.h"
@@ -70,18 +73,44 @@ void Game::Initialize()
         return;
     }
 
+    if (SDL_GL_LoadLibrary(NULL) != 0)
+    {
+        std::string error = SDL_GetError();
+        Logger::Err("Failed to Open GL Library: {0}");
+        return;
+    }
+
+    // Set the OpenGL attributes
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+
     SDL_DisplayMode displayMode;
     SDL_GetCurrentDisplayMode(0, &displayMode);
     windowWidth = 1200; // displayMode.w;
     windowHeight = 600; // displayMode.h;
 
-    window = SDL_CreateWindow(NULL, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, windowWidth, windowHeight, SDL_WINDOW_BORDERLESS);
+    window = SDL_CreateWindow(NULL, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, windowWidth, windowHeight, SDL_WINDOW_RESIZABLE);
 
     if (!window)
     {
         Logger::Err("Error creating SDL window");
         return;
     }
+
+    SDL_GLContext context = SDL_GL_CreateContext(window);
+
+    if (!context)
+    {
+
+        std::cerr << "SDL_GL_CreateContext Error: " << SDL_GetError() << std::endl;
+        SDL_DestroyWindow(window);
+        SDL_Quit();
+        return;
+    }
+
+    SDL_GL_MakeCurrent(window, context);
+    SDL_GL_SetSwapInterval(1);
 
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
@@ -91,13 +120,15 @@ void Game::Initialize()
         return;
     }
 
-    IMGUI_CHECKVERSION();
+    /* IMGUI_CHECKVERSION();
 
-    ImGui::CreateContext();
+     ImGui::CreateContext();
 
-    ImGui_ImplSDL2_InitForSDLRenderer(window, renderer);
+     ImGui_ImplSDL2_InitForSDLRenderer(window, renderer);
 
-    ImGui_ImplSDLRenderer2_Init(renderer);
+     ImGui_ImplSDLRenderer2_Init(renderer);
+ */
+    InitImGui();
 
     // Initialize camera view with entire screen area
     camera = {0, 0, windowWidth, windowHeight};
@@ -313,8 +344,15 @@ void Game::Render()
     {
         registry->GetSystem<RenderGuiSystem>().Update(renderer, registry);
     }
+    SDL_GL_MakeCurrent(window, GetGLContext());
 
-    SDL_RenderPresent(renderer);
+    Begin();
+    RenderImGui();
+    End();
+
+    SDL_GL_SwapWindow(window);
+
+    // SDL_RenderPresent(renderer);
 }
 
 void Game::Run()
@@ -335,7 +373,76 @@ void Game::Destroy()
     ImGui::DestroyContext();
 
     SDL_DestroyRenderer(renderer);
+
     SDL_DestroyWindow(window);
+
+    ImGui_ImplOpenGL3_Shutdown();
+
     SDL_Quit();
     isRunning = false;
+}
+
+bool Game::InitImGui()
+{
+    const char *glslVersion = "#version 330";
+    IMGUI_CHECKVERSION();
+
+    if (!ImGui::CreateContext())
+    {
+        Logger::Err("failed to initialize imgui context");
+        return false;
+    }
+
+    ImGuiIO &io = ImGui::GetIO();
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+    io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+
+    io.ConfigWindowsMoveFromTitleBarOnly = true;
+    SDL_GLContext context = SDL_GL_GetCurrentContext();
+    if (!ImGui_ImplSDL2_InitForOpenGL(window, context))
+    {
+        Logger::Err("failed to initialize imgui sdl2 for opengl");
+        return false;
+    }
+
+    if (!ImGui_ImplOpenGL3_Init(glslVersion))
+    {
+        Logger::Err("Failed to intialize ImGui OpenGL3!");
+        return false;
+    }
+
+    // ImGui_ImplSDL2_InitForSDLRenderer(window, renderer);
+
+    // ImGui_ImplSDLRenderer2_Init(renderer);
+    return true;
+}
+
+void Game::Begin()
+{
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplSDL2_NewFrame();
+    ImGui::NewFrame();
+}
+
+void Game::End()
+{
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+    ImGuiIO &io = ImGui::GetIO();
+    if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+    {
+        // SDL_GLContext backupContext = SDL_GL_GetCurrentContext();
+        ImGui::UpdatePlatformWindows();
+        ImGui::RenderPlatformWindowsDefault();
+
+        // SDL_GL_MakeCurrent(window, backupContext);
+    }
+    SDL_GL_SwapWindow(window);
+}
+
+void Game::RenderImGui()
+{
+    ImGui::ShowDemoWindow();
 }
