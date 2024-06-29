@@ -353,7 +353,7 @@ void Game::Render()
 
     SDL_GL_SwapWindow(window);
 
-    // SDL_RenderPresent(renderer);
+    SDL_RenderPresent(renderer);
 }
 
 void Game::Run()
@@ -437,10 +437,10 @@ void Game::End()
     ImGuiIO &io = ImGui::GetIO();
     if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
     {
-
+        SDL_GLContext backupContext = SDL_GL_GetCurrentContext();
         ImGui::UpdatePlatformWindows();
         ImGui::RenderPlatformWindowsDefault();
-        SDL_GLContext backupContext = SDL_GL_GetCurrentContext();
+
         SDL_GL_MakeCurrent(window, backupContext);
     }
     // SDL_GL_SwapWindow(window);
