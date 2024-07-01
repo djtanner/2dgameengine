@@ -87,7 +87,7 @@ void Game::Initialize()
 
     SDL_DisplayMode displayMode;
     SDL_GetCurrentDisplayMode(0, &displayMode);
-    windowWidth = 400;  // displayMode.w;
+    windowWidth = 1200; // displayMode.w;
     windowHeight = 600; // displayMode.h;
 
     window = SDL_CreateWindow(NULL, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, windowWidth, windowHeight, SDL_WINDOW_RESIZABLE);
@@ -157,6 +157,7 @@ void Game::ProcessInput()
                 isRunning = false;
                 return;
             }
+
             if (sdlEvent.key.keysym.sym == SDLK_d)
             {
                 renderColliders = !renderColliders;
@@ -343,6 +344,7 @@ void Game::Render()
 
     if (renderColliders)
     {
+
         registry->GetSystem<RenderGuiSystem>().Update(renderer, registry);
     }
     SDL_GL_MakeCurrent(window, GetGLContext());
@@ -437,11 +439,14 @@ void Game::End()
     ImGuiIO &io = ImGui::GetIO();
     if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
     {
+        // SDL_GLContext backupContext = SDL_GL_GetCurrentContext();
+        SDL_Window *backupWindow = SDL_GL_GetCurrentWindow();
         SDL_GLContext backupContext = SDL_GL_GetCurrentContext();
         ImGui::UpdatePlatformWindows();
         ImGui::RenderPlatformWindowsDefault();
 
-        SDL_GL_MakeCurrent(window, backupContext);
+        // SDL_GL_MakeCurrent(window, backupContext);
+        SDL_GL_MakeCurrent(backupWindow, backupContext);
     }
     // SDL_GL_SwapWindow(window);
 }
