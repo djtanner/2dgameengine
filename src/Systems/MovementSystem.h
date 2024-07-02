@@ -32,10 +32,10 @@ public:
 
                 sprite.flip == SDL_FLIP_NONE ? sprite.flip = SDL_FLIP_HORIZONTAL : sprite.flip = SDL_FLIP_NONE;
             }
-            else if (event.entity2.GetComponent<RigidBodyComponent>().velocity.y != 0)
-            {
-                sprite.flip == SDL_FLIP_NONE ? sprite.flip = SDL_FLIP_VERTICAL : sprite.flip = SDL_FLIP_NONE;
-            }
+            /* else if (event.entity2.GetComponent<RigidBodyComponent>().velocity.y != 0)
+             {
+                 sprite.flip == SDL_FLIP_NONE ? sprite.flip = SDL_FLIP_VERTICAL : sprite.flip = SDL_FLIP_NONE;
+             }*/
 
             event.entity2.GetComponent<RigidBodyComponent>().velocity.x *= -1;
             event.entity2.GetComponent<RigidBodyComponent>().velocity.y *= -1;
@@ -46,14 +46,13 @@ public:
 
             if (event.entity1.GetComponent<RigidBodyComponent>().velocity.x != 0)
             {
-
                 sprite.flip == SDL_FLIP_NONE ? sprite.flip = SDL_FLIP_HORIZONTAL : sprite.flip = SDL_FLIP_NONE;
             }
-            else if (event.entity1.GetComponent<RigidBodyComponent>().velocity.y != 0)
-            {
-                sprite.flip == SDL_FLIP_NONE ? sprite.flip = SDL_FLIP_VERTICAL : sprite.flip = SDL_FLIP_NONE;
-            }
-
+            /* else if (event.entity1.GetComponent<RigidBodyComponent>().velocity.y != 0)
+             {
+                 sprite.flip == SDL_FLIP_NONE ? sprite.flip = SDL_FLIP_VERTICAL : sprite.flip = SDL_FLIP_NONE;
+             }
+            */
             event.entity1.GetComponent<RigidBodyComponent>().velocity.x *= -1;
             event.entity1.GetComponent<RigidBodyComponent>().velocity.y *= -1;
         }
