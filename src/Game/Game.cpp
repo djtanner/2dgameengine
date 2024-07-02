@@ -72,8 +72,8 @@ void Game::Initialize()
 
     SDL_DisplayMode displayMode;
     SDL_GetCurrentDisplayMode(0, &displayMode);
-    windowWidth = 1200; // displayMode.w;
-    windowHeight = 600; // displayMode.h;
+    windowWidth = WINDOW_WIDTH;   // displayMode.w;
+    windowHeight = WINDOW_HEIGHT; // displayMode.h;
 
     window = SDL_CreateWindow(NULL, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, windowWidth, windowHeight, SDL_WINDOW_BORDERLESS);
 
