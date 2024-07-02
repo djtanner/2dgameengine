@@ -234,8 +234,17 @@ void Game::LoadLevel(int level)
     chopper.Tag("player");
 
     Entity tank = registry->CreateEntity();
-    tank.AddComponent<TransformComponent>(glm::vec2(200.0, 300.0), glm::vec2(1.0, 1.0), 0.0, false);
-    tank.AddComponent<RigidBodyComponent>(glm::vec2(-30.0, 0.0));
+    tank.AddComponent<TransformComponent>(glm::vec2(150.0, 150.0), glm::vec2(1.0, 1.0), 0.0, false);
+    tank.AddComponent<RigidBodyComponent>(glm::vec2(30.0, 0.0));
+    tank.AddComponent<SpriteComponent>("tank-image", TILE_SIZE, TILE_SIZE, 1);
+    tank.AddComponent<BoxColliderComponent>(TILE_SIZE, TILE_SIZE);
+    tank.AddComponent<ProjectileEmitterComponent>(glm::vec2(100.0, 0.0), 5000, 10000, false, 10);
+    tank.AddComponent<HealthComponent>(100);
+    tank.Group("enemies");
+
+    tank = registry->CreateEntity();
+    tank.AddComponent<TransformComponent>(glm::vec2(250.0, 50.0), glm::vec2(1.0, 1.0), 0.0, false);
+    tank.AddComponent<RigidBodyComponent>(glm::vec2(0.0, 30.0));
     tank.AddComponent<SpriteComponent>("tank-image", TILE_SIZE, TILE_SIZE, 1);
     tank.AddComponent<BoxColliderComponent>(TILE_SIZE, TILE_SIZE);
     tank.AddComponent<ProjectileEmitterComponent>(glm::vec2(100.0, 0.0), 5000, 10000, false, 10);

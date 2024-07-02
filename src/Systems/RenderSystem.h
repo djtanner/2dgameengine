@@ -54,7 +54,7 @@ public:
 
             SDL_Rect srcRect = sprite.srcRect;
 
-            SDL_RenderCopyEx(renderer, assetStore->GetTexture(sprite.assetId), &srcRect, &dstRect, transform.rotation, nullptr, SDL_FLIP_NONE);
+            SDL_RenderCopyEx(renderer, assetStore->GetTexture(sprite.assetId), &srcRect, &dstRect, transform.rotation, nullptr, sprite.flip);
 
             if (entity.hasCollider && renderColliders)
             {

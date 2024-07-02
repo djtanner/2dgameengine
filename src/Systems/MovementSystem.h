@@ -26,12 +26,34 @@ public:
     {
         if (event.entity1.BelongsToGroup("obstacles") && event.entity2.BelongsToGroup("enemies"))
         {
+            SpriteComponent &sprite = event.entity2.GetComponent<SpriteComponent>();
+            if (event.entity2.GetComponent<RigidBodyComponent>().velocity.x != 0)
+            {
+
+                sprite.flip == SDL_FLIP_NONE ? sprite.flip = SDL_FLIP_HORIZONTAL : sprite.flip = SDL_FLIP_NONE;
+            }
+            else if (event.entity2.GetComponent<RigidBodyComponent>().velocity.y != 0)
+            {
+                sprite.flip == SDL_FLIP_NONE ? sprite.flip = SDL_FLIP_VERTICAL : sprite.flip = SDL_FLIP_NONE;
+            }
 
             event.entity2.GetComponent<RigidBodyComponent>().velocity.x *= -1;
             event.entity2.GetComponent<RigidBodyComponent>().velocity.y *= -1;
         }
-        else if (event.entity2.BelongsToGroup("obstacles") && event.entity1.BelongsToGroup("obstacles"))
+        else if (event.entity1.BelongsToGroup("enemies") && event.entity2.BelongsToGroup("obstacles"))
         {
+            SpriteComponent &sprite = event.entity1.GetComponent<SpriteComponent>();
+
+            if (event.entity1.GetComponent<RigidBodyComponent>().velocity.x != 0)
+            {
+
+                sprite.flip == SDL_FLIP_NONE ? sprite.flip = SDL_FLIP_HORIZONTAL : sprite.flip = SDL_FLIP_NONE;
+            }
+            else if (event.entity1.GetComponent<RigidBodyComponent>().velocity.y != 0)
+            {
+                sprite.flip == SDL_FLIP_NONE ? sprite.flip = SDL_FLIP_VERTICAL : sprite.flip = SDL_FLIP_NONE;
+            }
+
             event.entity1.GetComponent<RigidBodyComponent>().velocity.x *= -1;
             event.entity1.GetComponent<RigidBodyComponent>().velocity.y *= -1;
         }
