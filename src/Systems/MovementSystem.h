@@ -26,6 +26,13 @@ public:
             transform.position.y += rigidbody.velocity.y * deltaTime;
 
             // Logger::Log("Entity moved to: " + std::to_string(transform.position.x) + ", " + std::to_string(transform.position.y));
+
+            // kill entity if it goes outside of map bounds
+            if (transform.position.x < 0 || transform.position.x > Game::mapWidth || transform.position.y < 0 || transform.position.y > Game::mapHeight)
+            {
+                if (!entity.HasTag("player"))
+                    entity.Kill();
+            }
         }
     }
 };
