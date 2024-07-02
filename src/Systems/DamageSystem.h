@@ -43,7 +43,7 @@ public:
         {
             auto projectileComponent = projectile.GetComponent<ProjectileComponent>();
 
-            if (!projectileComponent.isFriendly && projectileComponent.ownerEntityId != entity.GetId())
+            if (!projectileComponent.isFriendly && projectileComponent.ownerEntityId != entity.GetId() && entity.HasComponent<HealthComponent>())
             {
                 Logger::Err("Entity " + std::to_string(entity.GetId()) + " was hit by projectile " + std::to_string(projectile.GetId()));
                 health.health -= projectileComponent.damage;

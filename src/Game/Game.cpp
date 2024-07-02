@@ -188,6 +188,7 @@ void Game::LoadLevel(int level)
     assetStore->AddTexture(renderer, "chopper-image", "./assets/images/chopper-spritesheet.png");
     assetStore->AddTexture(renderer, "radar-image", "./assets/images/radar.png");
     assetStore->AddTexture(renderer, "projectile", "./assets/images/bullet.png");
+    assetStore->AddTexture(renderer, "tree-image", "./assets/images/tree.png");
     assetStore->AddFont("arial-font", "./assets/fonts/arial.ttf", 16);
     assetStore->AddFont("charriot-font", "./assets/fonts/charriot.ttf", 24);
 
@@ -233,9 +234,9 @@ void Game::LoadLevel(int level)
     chopper.Tag("player");
 
     Entity tank = registry->CreateEntity();
-    tank.AddComponent<TransformComponent>(glm::vec2(500.0, 10.0), glm::vec2(1.0, 1.0), 0.0, false);
-    tank.AddComponent<RigidBodyComponent>(glm::vec2(-30.0, 0));
-    tank.AddComponent<SpriteComponent>("tank-image", TILE_SIZE, TILE_SIZE, 2);
+    tank.AddComponent<TransformComponent>(glm::vec2(200.0, 300.0), glm::vec2(1.0, 1.0), 0.0, false);
+    tank.AddComponent<RigidBodyComponent>(glm::vec2(-30.0, 0.0));
+    tank.AddComponent<SpriteComponent>("tank-image", TILE_SIZE, TILE_SIZE, 1);
     tank.AddComponent<BoxColliderComponent>(TILE_SIZE, TILE_SIZE);
     tank.AddComponent<ProjectileEmitterComponent>(glm::vec2(100.0, 0.0), 5000, 10000, false, 10);
     tank.AddComponent<HealthComponent>(100);
@@ -247,13 +248,23 @@ void Game::LoadLevel(int level)
     tankLabel.Group("UIHealth");*/
 
     Entity truck = registry->CreateEntity();
-    truck.AddComponent<TransformComponent>(glm::vec2(10.0, 10.0), glm::vec2(1.0, 1.0), 0.0, false);
-    truck.AddComponent<RigidBodyComponent>(glm::vec2(20.0, 0.0));
+    truck.AddComponent<TransformComponent>(glm::vec2(200.0, 10.0), glm::vec2(1.0, 1.0), 0.0, false);
+    truck.AddComponent<RigidBodyComponent>(glm::vec2(30.0, 0.0));
     truck.AddComponent<SpriteComponent>("truck-image", TILE_SIZE, TILE_SIZE, 1);
     truck.AddComponent<BoxColliderComponent>(TILE_SIZE, TILE_SIZE);
     truck.AddComponent<ProjectileEmitterComponent>(glm::vec2(0.0, 100.0), 2000, 10000, false, 10);
     truck.AddComponent<HealthComponent>(100);
     truck.Group("enemies");
+
+    for (int i = 0; i < 15; i++)
+    {
+        Entity tree = registry->CreateEntity();
+        tree.AddComponent<TransformComponent>(glm::vec2(rand() % Game::mapWidth, rand() % Game::mapHeight), glm::vec2(1.0, 1.0), 0.0, false);
+        tree.AddComponent<RigidBodyComponent>(glm::vec2(0.0, 0.0));
+        tree.AddComponent<SpriteComponent>("tree-image", TILE_SIZE, TILE_SIZE, 1);
+        tree.AddComponent<BoxColliderComponent>(TILE_SIZE, TILE_SIZE);
+        tree.Group("obstacles");
+    }
 
     Entity radar = registry->CreateEntity();
     radar.AddComponent<TransformComponent>(glm::vec2(windowWidth - 74, 10.0), glm::vec2(1.0, 1.0), 0.0, true);
@@ -284,6 +295,7 @@ void Game::Update()
     registry->GetSystem<DamageSystem>().SubscribeToEvents(eventBus);
     registry->GetSystem<KeyboardControlSystem>().SubscribeToEvents(eventBus);
     registry->GetSystem<ProjectileEmitSystem>().SubscribeToEvents(eventBus);
+    registry->GetSystem<MovementSystem>().SubscribeToEvents(eventBus);
 
     registry->Update();
 
