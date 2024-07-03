@@ -5,4 +5,4 @@
 This is a 2D game engine using ECS architecture based on the course from [pikuma](https://pikuma.com/courses/cpp-2d-game-engine-development), with a couple of extensions and differences in data structures based on design decisions that I felt were better
 suited for what I wanted to accomplish.
 
-I also have a separate branch called "docking" where I plan to render the game itselfin an imgui window, making the engine more modular for an improved user experience.
+I also have a separate branch called "docking" where I plan to render the game itself in an imgui window, making the engine more modular for an improved user experience.
