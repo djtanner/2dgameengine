@@ -23,8 +23,7 @@ private:
     bool renderColliders = false;
     SDL_Rect camera;
 
-    void parseFile(std::string filename, std::vector<std::vector<int>> &tilemap);
-    // entity manager
+        // entity manager
     std::unique_ptr<Registry> registry;
     std::unique_ptr<AssetStore> assetStore;
     std::unique_ptr<EventBus> eventBus; // keeps track of event subscriptions
@@ -34,7 +33,6 @@ public:
     ~Game();
     void Initialize();
     void Run();
-    void LoadLevel(int level);
     void Setup();
     void ProcessInput();
     void Update();
