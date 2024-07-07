@@ -200,6 +200,22 @@ void LevelLoader::LoadLevel(sol::state &lua, std::unique_ptr<Registry> &registry
                 newEntity.AddComponent<RigidBodyComponent>(velocity);
             }
 
+            // Sprite
+            sol::optional<sol::table> sprite = entity["components"]["sprite"];
+            if (sprite != sol::nullopt)
+            {
+                sol::table spriteTable = sprite.value();
+                std::string assetId = spriteTable["texture_asset_id"];
+                int width = spriteTable["width"];
+                int height = spriteTable["height"];
+                int zIndex = spriteTable["zIndex"];
+                bool isFixed = spriteTable["isFixed"].get_or(false);
+                int srcRectX = spriteTable["src_rect_x"];
+                int srcRectY = spriteTable["src_rect_y"];
+                SDL_RendererFlip flip = spriteTable["flip"].get_or(SDL_FLIP_NONE);
+                newEntity.AddComponent<SpriteComponent>(assetId, width, height, zIndex, isFixed, srcRectX, srcRectY, flip);
+            }
+
             /*
 
 

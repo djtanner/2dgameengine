@@ -23,7 +23,7 @@ Level = {
     ----------------------------------------------------
     tilemap = {
         map_file = "./assets/tilemaps/jungle.map",
-        texture_asset_id = "tilemap-texture",
+        texture_asset_id = "tilemap-sheet",
         num_rows = 20,
         num_cols = 25,
         tile_size = 32,
@@ -48,7 +48,7 @@ Level = {
                     velocity = { x = 0.0, y = 0.0 }
                 },
                 sprite = {
-                    texture_asset_id = "chopper-texture",
+                    texture_asset_id = "chopper-image",
                     width = 32,
                     height = 32,
                     z_index = 4,
@@ -96,7 +96,7 @@ Level = {
                     rotation = 0.0, -- degrees
                 },
                 sprite = {
-                    texture_asset_id = "tank-texture",
+                    texture_asset_id = "tank-image",
                     width = 32,
                     height = 32,
                     z_index = 2
