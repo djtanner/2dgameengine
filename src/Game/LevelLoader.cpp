@@ -216,6 +216,17 @@ void LevelLoader::LoadLevel(sol::state &lua, std::unique_ptr<Registry> &registry
                 newEntity.AddComponent<SpriteComponent>(assetId, width, height, zIndex, isFixed, srcRectX, srcRectY, flip);
             }
 
+            // Animation
+            sol::optional<sol::table> animation = entity["components"]["animation"];
+            if (animation != sol::nullopt)
+            {
+                sol::table animationTable = animation.value();
+                int numFrames = animationTable["num_frames"];
+                int animationSpeed = animationTable["speed_rate"];
+                bool isLoop = animationTable["is_loop"].get_or(true);
+                newEntity.AddComponent<AnimationComponent>(numFrames, animationSpeed, isLoop);
+            }
+
             /*
 
 
