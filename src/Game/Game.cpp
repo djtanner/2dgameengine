@@ -223,7 +223,7 @@ void Game::LoadLevel(int level)
     Entity chopper = registry->CreateEntity();
 
     chopper.AddComponent<TransformComponent>(glm::vec2(10.0, 100.0), glm::vec2(1.0, 1.0), 0.0);
-    chopper.AddComponent<RigidBodyComponent>(glm::vec2(20.0, 0.0));
+    chopper.AddComponent<RigidBodyComponent>(glm::vec2(40.0, 0.0));
     chopper.AddComponent<SpriteComponent>("chopper-image", TILE_SIZE, TILE_SIZE, 2);
     chopper.AddComponent<BoxColliderComponent>(TILE_SIZE, TILE_SIZE);
     chopper.AddComponent<AnimationComponent>(2, 5, true);

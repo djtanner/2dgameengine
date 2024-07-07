@@ -77,6 +77,27 @@ public:
                 if (!entity.HasTag("player"))
                     entity.Kill();
             }
+
+            // don't let the player go outside of the map
+            if (entity.HasTag("player"))
+            {
+                if (transform.position.x < 0)
+                {
+                    transform.position.x = 0;
+                }
+                if (transform.position.x > Game::mapWidth - entity.GetComponent<SpriteComponent>().width)
+                {
+                    transform.position.x = Game::mapWidth - entity.GetComponent<SpriteComponent>().width;
+                }
+                if (transform.position.y < 0)
+                {
+                    transform.position.y = 0;
+                }
+                if (transform.position.y > Game::mapHeight - entity.GetComponent<SpriteComponent>().height)
+                {
+                    transform.position.y = Game::mapHeight - entity.GetComponent<SpriteComponent>().height;
+                }
+            }
         }
     }
 };
