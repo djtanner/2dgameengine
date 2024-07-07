@@ -5,6 +5,7 @@
 #include "../ECS/ECS.h"
 #include "../AssetStore/AssetStore.h"
 #include "../EventBus/EventBus.h"
+#include <sol/sol.hpp>
 
 const int FPS = 500;
 const int MILLISECS_PER_FRAME = 1000 / FPS;
@@ -23,7 +24,9 @@ private:
     bool renderColliders = false;
     SDL_Rect camera;
 
-        // entity manager
+    sol::state lua;
+
+    // entity manager
     std::unique_ptr<Registry> registry;
     std::unique_ptr<AssetStore> assetStore;
     std::unique_ptr<EventBus> eventBus; // keeps track of event subscriptions

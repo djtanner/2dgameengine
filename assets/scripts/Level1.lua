@@ -10,7 +10,9 @@ Level = {
         { type = "texture", id = "tank-texture",    file = "./assets/images/tank-tiger-up.png" },
         { type = "texture", id = "bullet-texture",  file = "./assets/images/bullet.png" },
         { type = "font"   , id = "pico8-font-5",    file = "./assets/fonts/pico8.ttf", font_size = 5 },
-        { type = "font"   , id = "pico8-font-10",   file = "./assets/fonts/pico8.ttf", font_size = 10 }
+        { type = "font"   , id = "pico8-font-10",   file = "./assets/fonts/pico8.ttf", font_size = 10 },
+        { type = "font"   , id = "charriot-font",   file = "./assets/fonts/charriot.ttf", font_size = 24 },
+        { type = "font"   , id = "arial-font",   file = "./assets/fonts/arial.ttf", font_size = 16 }
     },
 
     ----------------------------------------------------

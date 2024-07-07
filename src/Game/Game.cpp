@@ -6,6 +6,7 @@
 #include <imgui/imgui.h>
 #include <imgui/imgui_impl_sdl2.h>
 #include <imgui/imgui_impl_sdlrenderer2.h>
+#include <sol/sol.hpp>
 #include "LevelLoader.h"
 #include "../Logger/Logger.h"
 #include "../ECS/ECS.h"
@@ -144,7 +145,8 @@ void Game::Setup()
     registry->AddSystem<RenderGuiSystem>();
 
     LevelLoader loader;
-    loader.LoadLevel(renderer, registry, assetStore, 1);
+    lua.open_libraries(sol::lib::base, sol::lib::math);
+    loader.LoadLevel(lua, registry, assetStore, renderer, 1);
 }
 
 void Game::Update()
