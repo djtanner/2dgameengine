@@ -112,31 +112,36 @@ void LevelLoader::LoadLevel(sol::state &lua, std::unique_ptr<Registry> &registry
     sol::table map = level["tilemap"];
     std::string mapFilePath = map["map_file"];
     std::string mapTextureAssetId = map["texture_asset_id"];
-    int mapNumRows = map["num_rows"];
-    int mapNumCols = map["num_cols"];
-    int tileSize = map["tile_size"];
+
+    int TILE_SIZE = map["tile_size"];
     double mapScale = map["scale"];
-    std::fstream mapFile;
-    mapFile.open(mapFilePath);
-    for (int y = 0; y < mapNumRows; y++)
+
+    std::vector<std::vector<int>> tilemap;
+
+    parseFile(mapFilePath, tilemap);
+
+    int mapNumCols = tilemap[0].size();
+    int mapNumRows = tilemap.size();
+
+    //  create entities for each tile in the map
+    for (int i = 0; i < mapNumRows; i++)
     {
-        for (int x = 0; x < mapNumCols; x++)
+        for (int j = 0; j < mapNumCols; j++)
         {
-            char ch;
-            mapFile.get(ch);
-            int srcRectY = std::atoi(&ch) * tileSize;
-            mapFile.get(ch);
-            int srcRectX = std::atoi(&ch) * tileSize;
-            mapFile.ignore();
+            int val = tilemap[i][j];
+
+            //  get the x and y position of the tile in the tilemap to use as the source rect
+            int srcX = (val % 10) * TILE_SIZE;
+            int srcY = (val / 10) * TILE_SIZE;
 
             Entity tile = registry->CreateEntity();
-            tile.AddComponent<TransformComponent>(glm::vec2(x * (mapScale * tileSize), y * (mapScale * tileSize)), glm::vec2(mapScale, mapScale), 0.0);
-            tile.AddComponent<SpriteComponent>(mapTextureAssetId, tileSize, tileSize, 0, false, srcRectX, srcRectY);
+            tile.AddComponent<TransformComponent>(glm::vec2(j * TILE_SIZE * TILE_SCALE, i * TILE_SIZE * TILE_SCALE), glm::vec2(TILE_SCALE, TILE_SCALE), 0.0, false);
+            tile.AddComponent<SpriteComponent>("tilemap-sheet", TILE_SIZE, TILE_SIZE, 0, false, srcX, srcY);
+            tile.Group("tiles");
         }
     }
-    mapFile.close();
-    Game::mapWidth = mapNumCols * tileSize * mapScale;
-    Game::mapHeight = mapNumRows * tileSize * mapScale;
+    Game::mapWidth = mapNumCols * TILE_SIZE * mapScale;
+    Game::mapHeight = mapNumRows * TILE_SIZE * mapScale;
 
     /*  assetStore->AddTexture(renderer, "tank-image", "./assets/images/tank-panther-right.png");
   assetStore->AddTexture(renderer, "truck-image", "./assets/images/truck-ford-right.png");
