@@ -239,6 +239,15 @@ void LevelLoader::LoadLevel(sol::state &lua, std::unique_ptr<Registry> &registry
                 glm::vec2 offset = {offsetX, offsetY};
                 newEntity.AddComponent<BoxColliderComponent>(width, height, offset);
             }
+
+            // Health
+            sol::optional<sol::table> health = entity["components"]["health"];
+            if (health != sol::nullopt)
+            {
+                sol::table healthTable = health.value();
+                int healthValue = healthTable["health_percentage"];
+                newEntity.AddComponent<HealthComponent>(healthValue);
+            }
             /*
 
 
