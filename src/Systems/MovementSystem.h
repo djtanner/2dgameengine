@@ -7,6 +7,8 @@
 #include "../EventBus/EventBus.h"
 #include "../Logger/Logger.h"
 #include "../Components/ProjectileComponent.h"
+#include "../Components/SpriteComponent.h"
+#include "../Components/BoxColliderComponent.h"
 
 class MovementSystem : public System
 {
