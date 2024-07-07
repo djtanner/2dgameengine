@@ -227,16 +227,26 @@ void LevelLoader::LoadLevel(sol::state &lua, std::unique_ptr<Registry> &registry
                 newEntity.AddComponent<AnimationComponent>(numFrames, animationSpeed, isLoop);
             }
 
+            // Box Collider
+            sol::optional<sol::table> boxCollider = entity["components"]["boxcollider"];
+            if (boxCollider != sol::nullopt)
+            {
+                sol::table boxColliderTable = boxCollider.value();
+                int width = boxColliderTable["width"];
+                int height = boxColliderTable["height"];
+                int offsetX = boxColliderTable["offset"]["x"].get_or(0);
+                int offsetY = boxColliderTable["offset"]["y"].get_or(0);
+                glm::vec2 offset = {offsetX, offsetY};
+                newEntity.AddComponent<BoxColliderComponent>(width, height, offset);
+            }
             /*
 
 
                       Entity chopper = registry->CreateEntity();
 
-                      chopper.AddComponent<TransformComponent>(glm::vec2(10.0, 100.0), glm::vec2(1.0, 1.0), 0.0);
-                      chopper.AddComponent<RigidBodyComponent>(glm::vec2(40.0, 0.0));
-                      chopper.AddComponent<SpriteComponent>("chopper-image", TILE_SIZE, TILE_SIZE, 2);
+
                       chopper.AddComponent<BoxColliderComponent>(TILE_SIZE, TILE_SIZE);
-                      chopper.AddComponent<AnimationComponent>(2, 5, true);
+
                       chopper.AddComponent<KeyboardControlComponent>(glm::vec2(0.0, -40.0), glm::vec2(40.0, 0.0), glm::vec2(0.0, 40.0), glm::vec2(-40.0, 0.0));
                       chopper.AddComponent<CameraFollowComponent>();
                       chopper.AddComponent<HealthComponent>(100);
