@@ -36,10 +36,12 @@ public:
             renderableEntity.hasCollider = entity.HasComponent<BoxColliderComponent>();
 
             // only render entities that are in the camera view
-            if (renderableEntity.transformComponent.position.x + renderableEntity.spriteComponent.width * renderableEntity.transformComponent.scale.x < camera.x ||
-                renderableEntity.transformComponent.position.x > camera.x + camera.w ||
-                renderableEntity.transformComponent.position.y + renderableEntity.spriteComponent.height * renderableEntity.transformComponent.scale.y < camera.y ||
-                renderableEntity.transformComponent.position.y > camera.y + camera.h)
+            bool outsideCameraView = (renderableEntity.transformComponent.position.x + renderableEntity.spriteComponent.width * renderableEntity.transformComponent.scale.x < camera.x ||
+                                      renderableEntity.transformComponent.position.x > camera.x + camera.w ||
+                                      renderableEntity.transformComponent.position.y + renderableEntity.spriteComponent.height * renderableEntity.transformComponent.scale.y < camera.y ||
+                                      renderableEntity.transformComponent.position.y > camera.y + camera.h);
+
+            if (outsideCameraView && !renderableEntity.spriteComponent.isFixed)
             {
                 continue;
             }
