@@ -18,6 +18,7 @@
 #include "../Components/CameraFollowComponent.h"
 #include "../Components/UILabelComponent.h"
 #include "../Components/HealthComponent.h"
+#include "../Components/ScriptComponent.h"
 
 LevelLoader::LevelLoader()
 {
@@ -283,56 +284,15 @@ void LevelLoader::LoadLevel(sol::state &lua, std::unique_ptr<Registry> &registry
 
                 newEntity.AddComponent<KeyboardControlComponent>(up, right, down, left);
             }
-            /*
 
+            // Script
 
-
-
-                      Entity tank = registry->CreateEntity();
-                      tank.AddComponent<TransformComponent>(glm::vec2(150.0, 150.0), glm::vec2(1.0, 1.0), 0.0, false);
-                      tank.AddComponent<RigidBodyComponent>(glm::vec2(30.0, 0.0));
-                      tank.AddComponent<SpriteComponent>("tank-image", TILE_SIZE, TILE_SIZE, 1);
-                      tank.AddComponent<BoxColliderComponent>(TILE_SIZE, TILE_SIZE);
-                      tank.AddComponent<ProjectileEmitterComponent>(glm::vec2(100.0, 0.0), 5000, 10000, false, 10);
-                      tank.AddComponent<HealthComponent>(100);
-                      tank.Group("enemies");
-
-                      tank = registry->CreateEntity();
-                      tank.AddComponent<TransformComponent>(glm::vec2(250.0, 50.0), glm::vec2(1.0, 1.0), 0.0, false);
-                      tank.AddComponent<RigidBodyComponent>(glm::vec2(0.0, 30.0));
-                      tank.AddComponent<SpriteComponent>("tank-image", TILE_SIZE, TILE_SIZE, 1);
-                      tank.AddComponent<BoxColliderComponent>(TILE_SIZE, TILE_SIZE);
-                      tank.AddComponent<ProjectileEmitterComponent>(glm::vec2(100.0, 0.0), 5000, 10000, false, 10);
-                      tank.AddComponent<HealthComponent>(100);
-                      tank.Group("enemies");
-
-
-
-                      Entity truck = registry->CreateEntity();
-                      truck.AddComponent<TransformComponent>(glm::vec2(200.0, 10.0), glm::vec2(1.0, 1.0), 0.0, false);
-                      truck.AddComponent<RigidBodyComponent>(glm::vec2(30.0, 0.0));
-                      truck.AddComponent<SpriteComponent>("truck-image", TILE_SIZE, TILE_SIZE, 1);
-                      truck.AddComponent<BoxColliderComponent>(TILE_SIZE, TILE_SIZE);
-                      truck.AddComponent<ProjectileEmitterComponent>(glm::vec2(0.0, 100.0), 2000, 10000, false, 10);
-                      truck.AddComponent<HealthComponent>(100);
-                      truck.Group("enemies");
-
-                      for (int i = 0; i < 15; i++)
-                      {
-                          Entity tree = registry->CreateEntity();
-                          tree.AddComponent<TransformComponent>(glm::vec2(rand() % Game::mapWidth, rand() % Game::mapHeight), glm::vec2(1.0, 1.0), 0.0, false);
-                          tree.AddComponent<RigidBodyComponent>(glm::vec2(0.0, 0.0));
-                          tree.AddComponent<SpriteComponent>("tree-image", TILE_SIZE, TILE_SIZE, 1);
-                          tree.AddComponent<BoxColliderComponent>(TILE_SIZE, TILE_SIZE);
-                          tree.Group("obstacles");
-                      }
-
-                      Entity radar = registry->CreateEntity();
-                      radar.AddComponent<TransformComponent>(glm::vec2(Game::windowWidth - 74, 10.0), glm::vec2(1.0, 1.0), 0.0, true);
-                      radar.AddComponent<RigidBodyComponent>(glm::vec2(0.0, 0.0));
-                      radar.AddComponent<SpriteComponent>("radar-image", TILE_SIZE * 2, TILE_SIZE * 2, 1, true);
-                      radar.AddComponent<AnimationComponent>(8, 5, true);
-                      */
+            sol::optional<sol::table> script = entity["components"]["on_update_script"];
+            if (script != sol::nullopt)
+            {
+                sol::function func = entity["components"]["on_update_script"][0];
+                newEntity.AddComponent<ScriptComponent>(func);
+            }
         }
         i++;
     }

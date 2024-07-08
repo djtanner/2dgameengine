@@ -23,6 +23,7 @@
 #include "../Systems/RenderTextSystem.h"
 #include "../Systems/RenderHealthUISystem.h"
 #include "../Systems/RenderGuiSystem.h"
+#include "../Systems/ScriptSystem.h"
 #include "../AssetStore/AssetStore.h"
 #include <vector>
 #include <iostream>
@@ -143,6 +144,7 @@ void Game::Setup()
     registry->AddSystem<RenderTextSystem>();
     registry->AddSystem<RenderHealthUISystem>();
     registry->AddSystem<RenderGuiSystem>();
+    registry->AddSystem<ScriptSystem>();
 
     LevelLoader loader;
     lua.open_libraries(sol::lib::base, sol::lib::math, sol::lib::os);
@@ -176,9 +178,7 @@ void Game::Update()
     registry->GetSystem<CameraMovementSystem>().Update(camera);
     registry->GetSystem<ProjectileEmitSystem>().Update(registry);
     registry->GetSystem<ProjectileLifecycleSystem>().Update();
-
-    // Update the registry to process the entities that are waiting to be created/deleted
-    registry->Update();
+    registry->GetSystem<ScriptSystem>().Update();
 }
 
 void Game::Render()
