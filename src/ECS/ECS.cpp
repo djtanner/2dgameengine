@@ -109,13 +109,16 @@ void Registry::Update()
         // TODO : remove entity from component pool
         for (std::shared_ptr<IPool> const &componentPool : componentPools)
         {
+            if (componentPool)
+            {
+                componentPool->RemoveEntityFromPool(entity.GetId());
+            }
 
-            componentPool->RemoveEntityFromPool(entity.GetId());
-                }
-
-        entityComponentSignatures[entity.GetId()].reset();
+            entityComponentSignatures[entity.GetId()].reset();
+            RemoveEntityTag(entity);
+            RemoveEntityFromGroup(entity);
+        }
     }
-
     entitiesToBeKilled.clear();
 }
 

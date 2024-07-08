@@ -248,17 +248,32 @@ void LevelLoader::LoadLevel(sol::state &lua, std::unique_ptr<Registry> &registry
                 int healthValue = healthTable["health_percentage"];
                 newEntity.AddComponent<HealthComponent>(healthValue);
             }
+
+            // Projectile Emitter
+
+            sol::optional<sol::table> projectileEmitter = entity["components"]["projectile_emitter"];
+            if (projectileEmitter != sol::nullopt)
+            {
+                sol::table projectileEmitterTable = projectileEmitter.value();
+                glm::vec2 projectileVelocity = {projectileEmitterTable["projectile_velocity"]["x"], projectileEmitterTable["projectile_velocity"]["y"]};
+                int frequency = static_cast<int>(projectileEmitterTable["repeat_frequency"].get_or(1)) * 1000;
+                int projectileDuration = static_cast<int>(projectileEmitterTable["projectile_duration"].get_or(10)) * 1000;
+                int hitPercentageDamage = static_cast<int>(projectileEmitterTable["hit_percentage_damage"].get_or(10));
+                bool isFriendly = projectileEmitterTable["friendly"].get_or(false);
+
+                newEntity.AddComponent<ProjectileEmitterComponent>(projectileVelocity, frequency, projectileDuration, isFriendly, hitPercentageDamage);
+            }
             /*
 
 
                       Entity chopper = registry->CreateEntity();
 
 
-                      chopper.AddComponent<BoxColliderComponent>(TILE_SIZE, TILE_SIZE);
+
 
                       chopper.AddComponent<KeyboardControlComponent>(glm::vec2(0.0, -40.0), glm::vec2(40.0, 0.0), glm::vec2(0.0, 40.0), glm::vec2(-40.0, 0.0));
                       chopper.AddComponent<CameraFollowComponent>();
-                      chopper.AddComponent<HealthComponent>(100);
+
                       chopper.AddComponent<ProjectileEmitterComponent>(glm::vec2(150.0, 150.0), 0, 10000, false, 10);
                       chopper.Tag("player");
 
