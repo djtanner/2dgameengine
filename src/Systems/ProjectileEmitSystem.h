@@ -24,7 +24,7 @@ private:
         projectile.AddComponent<SpriteComponent>("projectile", 4, 4, 4);
         projectile.AddComponent<BoxColliderComponent>(4, 4);
         projectile.AddComponent<ProjectileComponent>(emitter.isFriendly, emitter.hitPercentageDamage, emitter.projectileDuration, entity.GetId());
-        }
+    }
 
     void setProjectilePosition(Entity &entity, glm::vec2 &projectilePosition, TransformComponent transform)
     {

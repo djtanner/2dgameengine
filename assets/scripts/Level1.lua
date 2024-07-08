@@ -7,7 +7,7 @@ Level = {
         [0] =
         { type = "texture", id = "tilemap-sheet", file = "./assets/tilemaps/jungle.png" },
         { type = "texture", id = "chopper-image", file = "./assets/images/chopper-spritesheet.png" },
-        { type = "texture", id = "tank-image",    file = "./assets/images/tank-tiger-up.png" },
+        { type = "texture", id = "tank-image",    file = "./assets/images/tank-tiger-right.png" },
         { type = "texture", id = "projectile",  file = "./assets/images/bullet.png" },
         { type = "texture", id = "truck-image",  file = "./assets/images/truck-ford-right.png" },
         { type = "texture", id = "radar-image",  file = "./assets/images/radar.png" },
@@ -51,7 +51,7 @@ Level = {
                     texture_asset_id = "chopper-image",
                     width = 32,
                     height = 32,
-                    z_index = 4,
+                    z_index = 2,
                     fixed = false,
                     src_rect_x = 0,
                     src_rect_y = 0
@@ -73,7 +73,7 @@ Level = {
                     projectile_duration = 10, -- seconds
                     repeat_frequency = 0, -- seconds
                     hit_percentage_damage = 10,
-                    friendly = true
+                    friendly = false
                 },
                 keyboard_controller = {
                     up_velocity = { x = 0, y = -50 },
