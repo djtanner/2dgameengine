@@ -2753,6 +2753,17 @@ Level = {
                 animation = {
                     num_frames = 2,
                     speed_rate = 10 -- fps
+                },
+                on_update_script = {
+                    [0] =
+                    function(entity, delta_time, ellapsed_time)
+                        -- print("Executing the UPF7 Lua script!")
+
+                        -- change the position of the the airplane to follow a sine wave movement
+                        local new_x = ellapsed_time * 0.09
+                        local new_y = 200 + (math.sin(ellapsed_time * 0.001) * 50)
+                        set_position(entity, new_x, new_y) -- set the new position
+                    end
                 }
                 
             }
