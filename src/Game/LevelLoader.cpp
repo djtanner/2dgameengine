@@ -192,7 +192,7 @@ void LevelLoader::LoadLevel(sol::state &lua, std::unique_ptr<Registry> &registry
             }
 
             // RigidBody
-            sol::optional<sol::table> rigidBody = entity["components"]["rigidBody"];
+            sol::optional<sol::table> rigidBody = entity["components"]["rigidbody"];
             if (rigidBody != sol::nullopt)
             {
                 sol::table rigidBodyTable = rigidBody.value();
@@ -263,19 +263,30 @@ void LevelLoader::LoadLevel(sol::state &lua, std::unique_ptr<Registry> &registry
 
                 newEntity.AddComponent<ProjectileEmitterComponent>(projectileVelocity, frequency, projectileDuration, isFriendly, hitPercentageDamage);
             }
+
+            // CameraFollow
+            sol::optional<sol::table> cameraFollow = entity["components"]["camera_follow"];
+            if (cameraFollow != sol::nullopt)
+            {
+                newEntity.AddComponent<CameraFollowComponent>();
+            }
+
+            // Keyboard Control
+            sol::optional<sol::table> keyboardControl = entity["components"]["keyboard_controller"];
+            if (keyboardControl != sol::nullopt)
+            {
+                sol::table keyboardControlTable = keyboardControl.value();
+                glm::vec2 up = {keyboardControlTable["up_velocity"]["x"], keyboardControlTable["up_velocity"]["y"]};
+                glm::vec2 right = {keyboardControlTable["right_velocity"]["x"], keyboardControlTable["right_velocity"]["y"]};
+                glm::vec2 down = {keyboardControlTable["down_velocity"]["x"], keyboardControlTable["down_velocity"]["y"]};
+                glm::vec2 left = {keyboardControlTable["left_velocity"]["x"], keyboardControlTable["left_velocity"]["y"]};
+
+                newEntity.AddComponent<KeyboardControlComponent>(up, right, down, left);
+            }
             /*
 
 
-                      Entity chopper = registry->CreateEntity();
 
-
-
-
-                      chopper.AddComponent<KeyboardControlComponent>(glm::vec2(0.0, -40.0), glm::vec2(40.0, 0.0), glm::vec2(0.0, 40.0), glm::vec2(-40.0, 0.0));
-                      chopper.AddComponent<CameraFollowComponent>();
-
-                      chopper.AddComponent<ProjectileEmitterComponent>(glm::vec2(150.0, 150.0), 0, 10000, false, 10);
-                      chopper.Tag("player");
 
                       Entity tank = registry->CreateEntity();
                       tank.AddComponent<TransformComponent>(glm::vec2(150.0, 150.0), glm::vec2(1.0, 1.0), 0.0, false);
