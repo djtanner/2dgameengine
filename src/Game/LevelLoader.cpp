@@ -136,7 +136,7 @@ void LevelLoader::LoadLevel(sol::state &lua, std::unique_ptr<Registry> &registry
 
             Entity tile = registry->CreateEntity();
             tile.AddComponent<TransformComponent>(glm::vec2(j * TILE_SIZE * TILE_SCALE, i * TILE_SIZE * TILE_SCALE), glm::vec2(TILE_SCALE, TILE_SCALE), 0.0, false);
-            tile.AddComponent<SpriteComponent>("tilemap-sheet", TILE_SIZE, TILE_SIZE, 0, false, srcX, srcY);
+            tile.AddComponent<SpriteComponent>(mapTextureAssetId, TILE_SIZE, TILE_SIZE, 0, false, srcX, srcY);
             tile.Group("tiles");
         }
     }
